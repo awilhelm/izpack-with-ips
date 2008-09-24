@@ -1,7 +1,7 @@
 IzPack Readme
 =============
 
-zPack is a one-stop solution for packaging, distributing and deploying
+IzPack is a one-stop solution for packaging, distributing and deploying
 applications.
 
 It is fully cross-platform and generates a single installer. As such,
