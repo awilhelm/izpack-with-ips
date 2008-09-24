@@ -1,0 +1,6 @@
+[submodule "utils/native-launcher"]
+	path = utils/native-launcher
+	url = git@github.com:jponge/izpack-launcher.git
+[submodule "utils/wrappers"]
+	path = utils/wrappers
+	url = git@github.com:jponge/izpack-utils.git
