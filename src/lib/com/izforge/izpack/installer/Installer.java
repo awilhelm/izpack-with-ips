@@ -24,7 +24,6 @@ package com.izforge.izpack.installer;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.StringTool;
 
-import javax.swing.*;
 import java.util.Date;
 
 /**
@@ -56,20 +55,6 @@ public class Installer
 
         try
         {
-            if (System.getenv("izpack.mode") != null && System.getenv("izpack.mode").equals("privileged"))
-            {
-                JOptionPane.showMessageDialog(null, System.getProperty("user.name"));
-            }
-            else
-            {
-                PrivilegedRunner runner = new PrivilegedRunner();
-                if (runner.isPlatformSupported() && runner.isElevationNeeded())
-                {
-                    runner.relaunchWithElevatedRights();
-                    return;
-                }
-            }
-
             if (args.length == 0)
             {
                 // can't load the GUIInstaller class on headless machines,
