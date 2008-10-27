@@ -230,7 +230,8 @@ public class InstallerBase
     {
         if (System.getenv("izpack.mode") != null && System.getenv("izpack.mode").equals("privileged"))
         {
-            JOptionPane.showMessageDialog(null, System.getProperty("user.name"));
+            //JOptionPane.showMessageDialog(null, System.getProperty("user.name"));
+            return;
         }
         else if (info.isPrivilegedExecutionRequired())
         {

@@ -26,6 +26,8 @@ import com.izforge.izpack.util.OsVersion;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This class is responsible for allowing the installer to re-launch itself with administrator permissions.
@@ -43,7 +45,7 @@ public class PrivilegedRunner
      */
     public boolean isPlatformSupported()
     {
-        return OsVersion.IS_MAC;
+        return OsVersion.IS_MAC || OsVersion.IS_UNIX;
     }
 
     /**
@@ -73,19 +75,34 @@ public class PrivilegedRunner
     {
         String javaCommand = getJavaCommand();
         String installer = getInstallerJar();
-        ProcessBuilder builder = new ProcessBuilder(getElevator(), javaCommand, "-jar", installer);
+        ProcessBuilder builder = new ProcessBuilder(getElevator(javaCommand, installer));
         builder.environment().put("izpack.mode", "privileged");
         builder.start().waitFor();
     }
 
-    private String getElevator() throws IOException, InterruptedException
+    private List<String> getElevator(String javaCommand, String installer) throws IOException, InterruptedException
     {
+        List<String> elevator = new ArrayList<String>();
         if (OsVersion.IS_OSX)
         {
-            return extractMacElevator().getCanonicalPath();
+            elevator.add(extractMacElevator().getCanonicalPath());
+            elevator.add(javaCommand);
+            elevator.add("-jar");
+            elevator.add(installer);
+        }
+        else if (OsVersion.IS_UNIX)
+        {
+            elevator.add("xterm");
+            elevator.add("-title");
+            elevator.add("Installer");
+            elevator.add("-e");
+            elevator.add("sudo");
+            elevator.add(javaCommand);
+            elevator.add("-jar");
+            elevator.add(installer);
         }
 
-        return null;
+        return elevator;
     }
 
     private File extractMacElevator() throws IOException, InterruptedException
