@@ -22,7 +22,8 @@
  * Run it as follows:
  *    elevate aplication.exe "argument1 argument2 argument3"
  *
- * Adapted from http://blogs.msdn.com/aaron_margosis/archive/2007/07/01/scripting-elevation-on-vista.aspx
+ * Adapted from Aaron Margosis 'elevate.js' script, see
+ * http://blogs.msdn.com/aaron_margosis/archive/2007/07/01/scripting-elevation-on-vista.aspx
  */
 
 Application = WScript.Arguments(0);
