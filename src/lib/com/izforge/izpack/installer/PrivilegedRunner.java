@@ -45,7 +45,7 @@ public class PrivilegedRunner
      */
     public boolean isPlatformSupported()
     {
-        return OsVersion.IS_MAC || OsVersion.IS_UNIX;
+        return OsVersion.IS_MAC || OsVersion.IS_UNIX || OsVersion.IS_WINDOWS;
     }
 
     /**
@@ -83,6 +83,7 @@ public class PrivilegedRunner
     private List<String> getElevator(String javaCommand, String installer) throws IOException, InterruptedException
     {
         List<String> elevator = new ArrayList<String>();
+        
         if (OsVersion.IS_OSX)
         {
             elevator.add(extractMacElevator().getCanonicalPath());
@@ -101,7 +102,28 @@ public class PrivilegedRunner
             elevator.add("-jar");
             elevator.add(installer);
         }
+        else if (OsVersion.IS_WINDOWS)
+        {
+            elevator.add(extractVistaElevator().getCanonicalPath());
+            elevator.add(javaCommand);
+            elevator.add("\"-jar " + installer + "\"");
+        }
 
+        return elevator;
+    }
+
+    private File extractVistaElevator() throws IOException
+    {
+        String path = System.getProperty("java.io.tmpdir") + File.separator + "Installer.js";
+        File elevator = new File(path);
+
+        FileOutputStream out = new FileOutputStream(elevator);
+        InputStream in = getClass().getResourceAsStream("/com/izforge/izpack/installer/elevator.js");
+        copyStream(out, in);
+        in.close();
+        out.close();
+
+        elevator.deleteOnExit();
         return elevator;
     }
 
