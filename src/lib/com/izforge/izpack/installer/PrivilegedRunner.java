@@ -76,6 +76,7 @@ public class PrivilegedRunner
         String javaCommand = getJavaCommand();
         String installer = getInstallerJar();
         ProcessBuilder builder = new ProcessBuilder(getElevator(javaCommand, installer));
+        System.out.println("Builder: " + builder);
         builder.environment().put("izpack.mode", "privileged");
         builder.start().waitFor();
     }
@@ -117,11 +118,15 @@ public class PrivilegedRunner
         String path = System.getProperty("java.io.tmpdir") + File.separator + "Installer.js";
         File elevator = new File(path);
 
+        System.out.println("Extracting (vista)...");
+
         FileOutputStream out = new FileOutputStream(elevator);
         InputStream in = getClass().getResourceAsStream("/com/izforge/izpack/installer/elevate.js");
         copyStream(out, in);
         in.close();
         out.close();
+
+        System.out.println("Extracted (vista)...");
 
         elevator.deleteOnExit();
         return elevator;
