@@ -118,7 +118,7 @@ public class PrivilegedRunner
         File elevator = new File(path);
 
         FileOutputStream out = new FileOutputStream(elevator);
-        InputStream in = getClass().getResourceAsStream("/com/izforge/izpack/installer/elevator.js");
+        InputStream in = getClass().getResourceAsStream("/com/izforge/izpack/installer/elevate.js");
         copyStream(out, in);
         in.close();
         out.close();
