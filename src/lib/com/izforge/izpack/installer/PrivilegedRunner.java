@@ -68,16 +68,17 @@ public class PrivilegedRunner
     /**
      * Relaunches the installer with elevated rights.
      *
+     * @return the status code returned by the launched process (by convention, 0 means a success).
      * @throws IOException
      * @throws InterruptedException
      */
-    public void relaunchWithElevatedRights() throws IOException, InterruptedException
+    public int relaunchWithElevatedRights() throws IOException, InterruptedException
     {
         String javaCommand = getJavaCommand();
         String installer = getInstallerJar();
         ProcessBuilder builder = new ProcessBuilder(getElevator(javaCommand, installer));
         builder.environment().put("izpack.mode", "privileged");
-        builder.start().waitFor();
+        return builder.start().waitFor();
     }
 
     private List<String> getElevator(String javaCommand, String installer) throws IOException, InterruptedException

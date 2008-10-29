@@ -230,7 +230,7 @@ public class InstallerBase
     {
         if (System.getenv("izpack.mode") != null && System.getenv("izpack.mode").equals("privileged"))
         {
-            //JOptionPane.showMessageDialog(null, System.getProperty("user.name"));
+            // We have been launched through a privileged execution, so stop the checkings here!
             return;
         }
         else if (info.isPrivilegedExecutionRequired())
@@ -240,8 +240,14 @@ public class InstallerBase
             {
                 try
                 {
-                    runner.relaunchWithElevatedRights();
-                    System.exit(0);
+                    if (runner.relaunchWithElevatedRights() == 0)
+                    {
+                        System.exit(0);
+                    }
+                    else
+                    {
+                        throw new RuntimeException("Launching an installer with elevated permissions failed.");
+                    }
                 }
                 catch (Exception e)
                 {
