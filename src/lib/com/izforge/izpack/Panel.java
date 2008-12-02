@@ -20,10 +20,11 @@
  */
 package com.izforge.izpack;
 
-import com.izforge.izpack.util.OsConstraint;
-
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+
+import com.izforge.izpack.util.OsConstraint;
 
 /**
  * @author Jan Blok
@@ -53,6 +54,11 @@ public class Panel implements Serializable
      * condition for this panel
      */
     private String condition = null;
+
+    /**
+     * A HashMap for URLs to Helpfiles, key should be iso3-code
+     */
+    private HashMap<String, String> helps = null;
 
     public String getClassName()
     {
@@ -88,7 +94,6 @@ public class Panel implements Serializable
         this.panelid = panelid;
     }
 
-
     /**
      * @return the condition
      */
@@ -96,7 +101,6 @@ public class Panel implements Serializable
     {
         return this.condition;
     }
-
 
     /**
      * @param condition the condition to set
@@ -109,5 +113,19 @@ public class Panel implements Serializable
     public boolean hasCondition()
     {
         return this.condition != null;
+    }
+
+    public void addHelp(String isoCode, String url)
+    {
+        if (this.helps == null)
+        {
+            this.helps = new HashMap<String, String>();
+        }
+        this.helps.put(isoCode, url);
+    }
+
+    public HashMap<String, String> getHelpsMap()
+    {
+        return this.helps;
     }
 }
