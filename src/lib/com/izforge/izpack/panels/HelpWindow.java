@@ -18,30 +18,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 package com.izforge.izpack.panels;
 
-import java.awt.Frame;
+import com.izforge.izpack.util.Debug;
+
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
 
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-
-import com.izforge.izpack.util.Debug;
-
 /**
  * Common HTML Help Window (modal)
- * 
- * @version $Id: HelpWindow.java,v 1.1.2.3 2008/10/07 05:21:58 zbp Exp $
  */
 public class HelpWindow extends JDialog implements HyperlinkListener, ActionListener
 {
@@ -55,37 +47,33 @@ public class HelpWindow extends JDialog implements HyperlinkListener, ActionList
 
     public final static String SRC_ATTRIBUTE = "src";
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = -357544689286217809L;
 
-    private JPanel jContentPane = null;
+    private JPanel contentPane = null;
 
-    private JEditorPane _htmlHelp = null;
+    private JEditorPane htmlHelp = null;
 
-    private JButton _btnClose = null;
+    private JButton closeButton = null;
 
-    private JScrollPane _scrollPane = null;
+    private JScrollPane scrollPane = null;
 
-    private String _closeButtonText = "Close";
+    private String closeButtonText = "Close";
 
     /**
      * This is the default constructor
-     * 
-     * @param owner - owner Frame
+     *
+     * @param owner           - owner Frame
      * @param closeButtonText - Button Text for Close button
      */
     public HelpWindow(Frame owner, String closeButtonText)
     {
         super(owner, true);
-        _closeButtonText = closeButtonText;
+        this.closeButtonText = closeButtonText;
         initialize();
     }
 
     /**
      * This method initializes Help Dialog
-     * 
      */
     private void initialize()
     {
@@ -96,82 +84,82 @@ public class HelpWindow extends JDialog implements HyperlinkListener, ActionList
 
     /**
      * This method initializes jContentPane
-     * 
+     *
      * @return javax.swing.JPanel
      */
     private JPanel getJContentPane()
     {
-        if (jContentPane == null)
+        if (contentPane == null)
         {
-            jContentPane = new JPanel();
-            jContentPane.setLayout(new BoxLayout(getJContentPane(), BoxLayout.Y_AXIS));
-            jContentPane.add(get_scrollPane(), null);
-            jContentPane.add(get_btnClose(), null);
+            contentPane = new JPanel();
+            contentPane.setLayout(new BoxLayout(getJContentPane(), BoxLayout.Y_AXIS));
+            contentPane.add(getScrollPane(), null);
+            contentPane.add(getCloseButton(), null);
         }
-        return jContentPane;
+        return contentPane;
     }
 
     /**
      * This method initializes _htmlHelp
-     * 
+     *
      * @return javax.swing.JEditorPane
      */
-    private JEditorPane get_htmlHelp()
+    private JEditorPane getHtmlHelp()
     {
-        if (_htmlHelp == null)
+        if (htmlHelp == null)
         {
             try
             {
-                _htmlHelp = new JEditorPane();
-                _htmlHelp.setContentType("text/html"); // Generated
-                _htmlHelp.setEditable(false);
-                _htmlHelp.addHyperlinkListener(this);
+                htmlHelp = new JEditorPane();
+                htmlHelp.setContentType("text/html"); // Generated
+                htmlHelp.setEditable(false);
+                htmlHelp.addHyperlinkListener(this);
             }
             catch (java.lang.Throwable e)
             {
                 Debug.log(e.getLocalizedMessage());
             }
         }
-        return _htmlHelp;
+        return htmlHelp;
     }
 
-    private JScrollPane get_scrollPane()
+    private JScrollPane getScrollPane()
     {
-        if (_scrollPane == null)
+        if (scrollPane == null)
         {
             try
             {
-                _scrollPane = new JScrollPane(get_htmlHelp());
+                scrollPane = new JScrollPane(getHtmlHelp());
             }
             catch (java.lang.Throwable e)
             {
                 Debug.log(e.getLocalizedMessage());
             }
         }
-        return _scrollPane;
+        return scrollPane;
     }
 
     /**
      * This method initializes _btnClose
-     * 
+     *
      * @return javax.swing.JButton
      */
-    private JButton get_btnClose()
+    private JButton getCloseButton()
     {
-        if (_btnClose == null)
+        if (closeButton == null)
         {
             try
             {
-                _btnClose = new JButton(_closeButtonText);
-                _btnClose.setAlignmentX(CENTER_ALIGNMENT);
-                _btnClose.addActionListener(this);
+                closeButton = new JButton(closeButtonText);
+                closeButton.setAlignmentX(CENTER_ALIGNMENT);
+                closeButton.addActionListener(this);
             }
             catch (java.lang.Throwable e)
             {
                 Debug.log(e.getLocalizedMessage());
             }
         }
-        return _btnClose;
+        return closeButton;
     }
 
     public void hyperlinkUpdate(HyperlinkEvent e)
@@ -180,7 +168,7 @@ public class HelpWindow extends JDialog implements HyperlinkListener, ActionList
         {
             if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
             {
-                get_htmlHelp().setPage(e.getURL());
+                getHtmlHelp().setPage(e.getURL());
             }
         }
         catch (Exception err)
@@ -191,7 +179,7 @@ public class HelpWindow extends JDialog implements HyperlinkListener, ActionList
 
     /**
      * displays Help Text in a modal window
-     * 
+     *
      * @param title
      * @param helpDocument
      */
@@ -200,7 +188,7 @@ public class HelpWindow extends JDialog implements HyperlinkListener, ActionList
         this.setTitle(title);
         try
         {
-            get_htmlHelp().setPage(helpDocument);
+            getHtmlHelp().setPage(helpDocument);
         }
         catch (IOException e)
         {
