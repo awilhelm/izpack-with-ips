@@ -325,6 +325,12 @@ public class InstallerFrame extends JFrame
             // metadata will be not set.
             object = constructor.newInstance(params);
             panel = (IzPanel) object;
+            String dataValidator = p.getValidator();
+            if (dataValidator != null)
+            {
+                panel.setValidationService(DataValidatorFactory.createDataValidator(dataValidator));
+            }
+
             panel.setHelps(p.getHelpsMap());
 
             installdata.panels.add(panel);
@@ -1591,7 +1597,7 @@ public class InstallerFrame extends JFrame
             // We must trasfer all fields into the variables before
             // panelconditions try to resolve the rules based on unassigned vars.
             boolean isValid = doValidation ? ((IzPanel) installdata.panels.get(startPanel))
-                    .isValidated() : true;
+                    .panelValidated() : true;
 
             // if this is not here, validation will
             // occur mutilple times while skipping panels through the recursion

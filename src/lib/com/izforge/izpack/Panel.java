@@ -56,6 +56,11 @@ public class Panel implements Serializable
     private String condition = null;
 
     /**
+     * The validator for this panel
+     */
+    private String validator = null;
+
+    /**
      * A HashMap for URLs to Helpfiles, key should be iso3-code
      */
     private HashMap<String, String> helps = null;
@@ -113,6 +118,16 @@ public class Panel implements Serializable
     public boolean hasCondition()
     {
         return this.condition != null;
+    }
+
+    public String getValidator()
+    {
+        return validator;
+    }
+
+    public void setValidator(String validator)
+    {
+        this.validator = validator;
     }
 
     public void addHelp(String isoCode, String url)

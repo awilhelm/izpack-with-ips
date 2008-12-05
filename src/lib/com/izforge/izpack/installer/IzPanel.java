@@ -19,12 +19,7 @@
  */
 package com.izforge.izpack.installer;
 
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.LayoutManager2;
+import java.awt.*;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -122,6 +117,8 @@ public class IzPanel extends JPanel implements AbstractUIHandler, LayoutConstant
      * HEADLINE = "headline"
      */
     public final static String HEADLINE = "headline";
+
+    private DataValidator validationService = null;
 
     /**
      * X_ORIGIN = 0
@@ -374,9 +371,14 @@ public class IzPanel extends JPanel implements AbstractUIHandler, LayoutConstant
      * 
      * @return A boolean stating whether the panel has been validated or not.
      */
-    public boolean isValidated()
+    protected boolean isValidated()
     {
         return true;
+    }
+
+    public boolean panelValidated()
+    {
+        return isValidated() && validatePanel();
     }
 
     /**
@@ -990,6 +992,82 @@ public class IzPanel extends JPanel implements AbstractUIHandler, LayoutConstant
     public void setMetadata(Panel p)
     {
         this.metadata = p;
+    }
+
+    public DataValidator getValidationService()
+    {
+        return validationService;
+    }
+
+    public void setValidationService(DataValidator validationService)
+    {
+        this.validationService = validationService;
+    }
+
+    /*--------------------------------------------------------------------------*/
+    /**
+     * This method validates the field content. Validating is performed through a user supplied
+     * service class that provides the validation rules.
+     * 
+     * @return <code>true</code> if the validation passes or no implementation of a validation
+     * rule exists. Otherwise <code>false</code> is returned.
+     */
+    /*--------------------------------------------------------------------------*/
+    private final boolean validatePanel()
+    {
+        boolean returnValue = false;
+        if (this.validationService != null)
+        {
+            Component guiComponent = getTopLevelAncestor();
+            Cursor originalCursor = guiComponent.getCursor();
+            Cursor newCursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
+            try
+            {
+                guiComponent.setCursor(newCursor);
+                // validating the data
+                DataValidator.Status returnStatus = this.validationService.validateData(this.idata);
+                if (returnStatus == DataValidator.Status.OK)
+                {
+                    returnValue = true;
+                }
+                else
+                {
+                    Debug.trace("Validation did not pass!");
+                    // try to parse the text, and substitute any variable it finds
+                    VariableSubstitutor vs = new VariableSubstitutor(idata.getVariables());
+                    if (this.validationService.getWarningMessageId() != null
+                            && returnStatus == DataValidator.Status.WARNING)
+                    {
+
+                        String warningMessage = parent.langpack.getString(this.validationService
+                                .getWarningMessageId());
+                        if (this.emitWarning(getString("data.validation.warning.title"), vs
+                                .substitute(warningMessage, null)))
+                        {
+                            returnValue = true;
+                            Debug.trace("... but user decided to go on!");
+                        }
+                    }
+                    else
+                    {
+                        String errorMessage = parent.langpack.getString(this.validationService
+                                .getErrorMessageId());
+                        this.emitError(getString("data.validation.error.title"), vs.substitute(
+                                errorMessage, null));
+
+                    }
+                }
+            }
+            finally
+            {
+                guiComponent.setCursor(originalCursor);
+            }
+        }
+        else
+        {
+            returnValue = true;
+        }
+        return returnValue;
     }
 
     /**

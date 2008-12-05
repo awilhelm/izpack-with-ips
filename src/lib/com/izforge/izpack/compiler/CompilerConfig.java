@@ -81,6 +81,7 @@ import com.izforge.izpack.ParsableFile;
 import com.izforge.izpack.UpdateCheck;
 import com.izforge.izpack.compiler.Compiler.CmdlinePackagerListener;
 import com.izforge.izpack.event.CompilerListener;
+import com.izforge.izpack.installer.DataValidator;
 import com.izforge.izpack.installer.InstallerRequirement;
 import com.izforge.izpack.panels.HelpWindow;
 import com.izforge.izpack.rules.Condition;
@@ -1491,6 +1492,18 @@ public class CompilerConfig extends Thread
             else
             {
                 panel.className = className;
+            }
+            // adding validator
+            XMLElement validatorElement = xmlPanel
+                    .getFirstChildNamed(DataValidator.DATA_VALIDATOR_TAG);
+            if (validatorElement != null)
+            {
+                String validator = validatorElement
+                        .getAttribute(DataValidator.DATA_VALIDATOR_CLASSNAME_TAG);
+                if (!"".equals(validator))
+                {
+                    panel.setValidator(validator);
+                }
             }
             // adding helps
             Vector helps = xmlPanel.getChildrenNamed(HelpWindow.HELP_TAG);
