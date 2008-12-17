@@ -47,9 +47,9 @@ public class PacksPanelAutomationHelper implements PanelAutomation
     public void makeXMLData(AutomatedInstallData idata, XMLElement panelRoot)
     {
         // We add each pack to the panelRoot element
-        for (int i = 0; i < idata.allPacks.size(); i++)
+        for (int i = 0; i < idata.availablePacks.size(); i++)
         {
-            Pack pack = idata.allPacks.get(i);
+            Pack pack = idata.availablePacks.get(i);
             XMLElement el = new XMLElement("pack");
             el.setAttribute("index", Integer.toString(i));
             el.setAttribute("name", pack.name);
@@ -99,7 +99,12 @@ public class PacksPanelAutomationHelper implements PanelAutomation
                             if (el.getAttribute("selected").equalsIgnoreCase("true") ||
                                     el.getAttribute("selected").equalsIgnoreCase("on"))
                             {
-                                idata.selectedPacks.add(idata.availablePacks.get(index));
+                                Pack pack = (Pack) idata.availablePacks.get(index);
+                                if ((pack.id != null) && (!idata.getRules().canInstallPack(pack.id,idata.getVariables()))){
+                                    System.out.println("Condition for pack " + pack.name + " not fulfilled. Skipping pack.");
+                                    continue;
+                                }
+                                idata.selectedPacks.add(pack);
                             }
                         }
                         else
@@ -132,7 +137,7 @@ public class PacksPanelAutomationHelper implements PanelAutomation
                             Pack pack = (Pack) pack_it.next();
 
                             if (pack.name.equals(name))
-                            {
+                            {                                           
                                 idata.selectedPacks.add(pack);
                                 found = true;
                             }
