@@ -12,7 +12,7 @@ $Id$
 <!-- The root element -->
 <!ELEMENT installation (info, packaging?, properties?, variables?,dynamicvariables?,conditions?,installerrequirements?,
                         guiprefs?, locale, resources?, panels,
-                        listeners?, packs, jar*, native*)>
+                        listeners?, packs, jar*, native*, ips-pack*)>
 <!ATTLIST installation version CDATA #REQUIRED>
 
 <!-- The info section (general information on an installation) -->
@@ -208,3 +208,7 @@ $Id$
 <!ELEMENT jar EMPTY>
     <!ATTLIST jar src CDATA #REQUIRED>
     <!ATTLIST jar stage (install|uninstall|both) "install">
+
+<!-- The ips-pack section (indicates the IPS packs to create) -->
+<!ELEMENT ips-pack (include*, exclude*)>
+	<!ATTLIST ips-pack src CDATA #REQUIRED>
