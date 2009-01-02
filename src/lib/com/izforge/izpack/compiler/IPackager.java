@@ -110,6 +110,13 @@ public interface IPackager
      */
     public abstract void addPack(PackInfo pack);
 
+     /**
+     * Adds an IPS pack.
+     *
+     * @param ipspack contains information about the IPS Pack
+     */
+    public abstract void addIPSPack(IPSPack ipspack);
+
     /**
      * Gets the packages list
      */

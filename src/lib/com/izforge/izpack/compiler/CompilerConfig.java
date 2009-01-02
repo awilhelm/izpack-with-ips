@@ -666,9 +666,11 @@ public class CompilerConfig extends Thread
         Vector<XMLElement> packElements = root.getChildrenNamed("pack");
         Vector<XMLElement> refPackElements = root.getChildrenNamed("refpack");
         Vector<XMLElement> refPackSets = root.getChildrenNamed("refpackset");
-        if (packElements.isEmpty() && refPackElements.isEmpty() && refPackSets.isEmpty())
+        Vector<XMLElement> IPSPackElements = root.getChildrenNamed("ips-pack");
+
+        if (packElements.isEmpty() && refPackElements.isEmpty() && refPackSets.isEmpty() && IPSPackElements.isEmpty())
         {
-            parseError(root, "<packs> requires a <pack>, <refpack> or <refpackset>");
+            parseError(root, "<packs> requires a <pack>, <refpack>, <refpackset> or <ips-pack>");
         }
 
         File baseDir = new File(basedir);
@@ -1127,8 +1129,57 @@ public class CompilerConfig extends Thread
                 addPacksSingle(refXMLData);
             }
         }
-
         notifyCompilerListener("addPacksSingle", CompilerListener.END, data);
+
+        notifyCompilerListener("addIPSPacks", CompilerListener.BEGIN, data);
+
+        Iterator<XMLElement> IPSPackIter = IPSPackElements.iterator();
+        while (IPSPackIter.hasNext())
+        {
+            XMLElement el = IPSPackIter.next();
+
+            String src = requireAttribute(el, "src");
+            String description = requireChildNamed(el, "description").getContent();
+            String version = requireChildNamed(el, "version").getContent();
+
+            // get includes and excludes
+            Vector<XMLElement> xcludesList = null;
+            String[] includes = null;
+            xcludesList = el.getChildrenNamed("include");
+            if (!xcludesList.isEmpty())
+            {
+                includes = new String[xcludesList.size()];
+                for (int j = 0; j < xcludesList.size(); j++)
+                {
+                    XMLElement xclude = xcludesList.get(j);
+                    includes[j] = requireAttribute(xclude, "name");
+                }
+            }
+            String[] excludes = null;
+            xcludesList = el.getChildrenNamed("exclude");
+            if (!xcludesList.isEmpty())
+            {
+                excludes = new String[xcludesList.size()];
+                for (int j = 0; j < xcludesList.size(); j++)
+                {
+                    XMLElement xclude = xcludesList.get(j);
+                    excludes[j] = requireAttribute(xclude, "name");
+                }
+            }
+
+
+            // New instance for the pack
+            IPSPack newIpsPack = new IPSPack(src, description, version, includes, excludes);
+
+            compiler.addIPSPack(newIpsPack);
+
+
+        }
+
+        notifyCompilerListener("addIPSPacks", CompilerListener.END, data);
+
+
+
     }
 
     private XMLElement readRefPackData(String refFileName, boolean isselfcontained)
@@ -1538,6 +1589,7 @@ public class CompilerConfig extends Thread
         }
         notifyCompilerListener("addPanels", CompilerListener.END, data);
     }
+
 
     /**
      * Adds the resources.

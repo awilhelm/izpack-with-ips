@@ -125,7 +125,7 @@ $Id$
         <!ATTLIST listener jar CDATA #IMPLIED>
 
 <!-- The packs section (indicates the packs to create) -->
-<!ELEMENT packs ((pack|refpack)+)>
+<!ELEMENT packs ((pack|refpack|ips-pack)+)>
     <!ELEMENT pack (description, os*, file*, singlefile*, fileset*, updatecheck?, parsable*, executable*, depends*)>
         <!ATTLIST pack name CDATA #REQUIRED>
         <!ATTLIST pack id CDATA #IMPLIED>
@@ -197,7 +197,10 @@ $Id$
           <!ATTLIST depends packname CDATA #REQUIRED>
     <!ELEMENT refpack EMPTY>
         <!ATTLIST refpack file CDATA #REQUIRED>
-          
+<!-- The ips-pack section (indicates the IPS packs to create) -->
+    <!ELEMENT ips-pack (description, include*, exclude*)>
+	    <!ATTLIST ips-pack src CDATA #REQUIRED>
+
 <!-- Allows the inclusion in the installer or uninstaller of a native library -->
 <!ELEMENT native (os*)>
     <!ATTLIST native type (izpack|3rdparty) #REQUIRED>
@@ -209,6 +212,5 @@ $Id$
     <!ATTLIST jar src CDATA #REQUIRED>
     <!ATTLIST jar stage (install|uninstall|both) "install">
 
-<!-- The ips-pack section (indicates the IPS packs to create) -->
-<!ELEMENT ips-pack (include*, exclude*)>
-	<!ATTLIST ips-pack src CDATA #REQUIRED>
+
+

@@ -85,6 +85,12 @@
             <description>The sources</description>
             <file src="src" targetdir="$INSTALL_PATH"/>
         </pack>
+        <ips-pack src="http://a_repository.com/...">
+            <description>The base files</description>
+        </ips-pack>
+        <ips-pack src="http://another_repository.com/...">
+            <description>IPS Pack 2</description>
+        </ips-pack>
     </packs>
 
 </installation>

@@ -85,6 +85,12 @@ public abstract class PackagerBase implements IPackager
     protected List<PackInfo> packsList = new ArrayList<PackInfo>();
 
     /**
+    * The IPS Packs informations.
+    */
+   protected List<IPSPack> IPSpacksList = new ArrayList<IPSPack>();
+
+
+    /**
      * The ordered langpack locale names.
      */
     protected List<String> langpackNameList = new ArrayList<String>();
@@ -251,6 +257,15 @@ public abstract class PackagerBase implements IPackager
     public void addPack(PackInfo pack)
     {
         packsList.add(pack);
+    }
+
+
+    /* (non-Javadoc)
+     * @see com.izforge.izpack.compiler.IPackager#addPack(com.izforge.izpack.compiler.PackInfo)
+     */
+    public void addIPSPack(IPSPack ipspack)
+    {
+        IPSpacksList.add(ipspack);
     }
 
     /* (non-Javadoc)
