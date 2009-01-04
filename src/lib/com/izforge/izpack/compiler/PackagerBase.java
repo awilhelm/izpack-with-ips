@@ -261,7 +261,7 @@ public abstract class PackagerBase implements IPackager
 
 
     /* (non-Javadoc)
-     * @see com.izforge.izpack.compiler.IPackager#addPack(com.izforge.izpack.compiler.PackInfo)
+     * @see com.izforge.izpack.compiler.IPackager#addIPSPack(com.izforge.izpack.compiler.IPSPack)
      */
     public void addIPSPack(IPSPack ipspack)
     {
