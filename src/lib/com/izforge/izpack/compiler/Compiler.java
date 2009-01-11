@@ -40,8 +40,6 @@ import java.util.*;
 import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 
-import net.n3.nanoxml.XMLElement;
-
 /**
  * The IzPack compiler class. This is now a java bean style class that can be
  * configured using the object representations of the install.xml
@@ -510,8 +508,7 @@ public class Compiler extends Thread
      /**
      * Add an IPS Pack to the installation.
      *
-     * @param name
-     * @param url
+     * @param ipspack
      */
     public void addIPSPack(IPSPack ipspack)
     {

@@ -71,14 +71,7 @@ import net.n3.nanoxml.XMLWriter;
 
 import org.apache.tools.ant.DirectoryScanner;
 
-import com.izforge.izpack.CustomData;
-import com.izforge.izpack.ExecutableFile;
-import com.izforge.izpack.GUIPrefs;
-import com.izforge.izpack.Info;
-import com.izforge.izpack.PackFile;
-import com.izforge.izpack.Panel;
-import com.izforge.izpack.ParsableFile;
-import com.izforge.izpack.UpdateCheck;
+import com.izforge.izpack.*;
 import com.izforge.izpack.compiler.Compiler.CmdlinePackagerListener;
 import com.izforge.izpack.event.CompilerListener;
 import com.izforge.izpack.installer.DataValidator;
@@ -1140,7 +1133,7 @@ public class CompilerConfig extends Thread
 
             String src = requireAttribute(el, "src");
             String description = requireChildNamed(el, "description").getContent();
-            String version = requireChildNamed(el, "version").getContent();
+            String version = el.getAttribute("version");
 
             // get includes and excludes
             Vector<XMLElement> xcludesList = null;

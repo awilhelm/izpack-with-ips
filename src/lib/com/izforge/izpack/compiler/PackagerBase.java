@@ -22,10 +22,7 @@
 
 package com.izforge.izpack.compiler;
 
-import com.izforge.izpack.CustomData;
-import com.izforge.izpack.GUIPrefs;
-import com.izforge.izpack.Info;
-import com.izforge.izpack.Panel;
+import com.izforge.izpack.*;
 import com.izforge.izpack.compressor.PackCompressor;
 import com.izforge.izpack.compressor.PackCompressorFactory;
 import com.izforge.izpack.installer.InstallerRequirement;
@@ -261,7 +258,7 @@ public abstract class PackagerBase implements IPackager
 
 
     /* (non-Javadoc)
-     * @see com.izforge.izpack.compiler.IPackager#addIPSPack(com.izforge.izpack.compiler.IPSPack)
+     * @see com.izforge.izpack.compiler.IPackager#addIPSPack(com.izforge.izpack.IPSPack)
      */
     public void addIPSPack(IPSPack ipspack)
     {
@@ -401,6 +398,8 @@ public abstract class PackagerBase implements IPackager
         writeInstallerResources();
         writeIncludedJars();
 
+        writeIPSPacks();
+
         // Pack File Data may be written to separate jars
         writePacks();
     }
@@ -414,6 +413,27 @@ public abstract class PackagerBase implements IPackager
     protected abstract void writeIncludedJars() throws IOException;
 
     protected abstract void writePacks() throws Exception;
+
+    protected void writeIPSPacks() throws Exception
+    {
+        final int num = IPSpacksList.size();
+        sendMsg("Writing " + num + " IPS Pack" + (num > 1 ? "s" : "") + " into installer");
+
+        int packNumber = 0;
+        Iterator<IPSPack> packIter = IPSpacksList.iterator();
+
+        // Each IPS Pack information is added to the installer
+        while (packIter.hasNext())
+        {
+            IPSPack ipsPack = packIter.next();
+
+            writeInstallerObject("ips/" + (packNumber+1), ipsPack);
+
+            packNumber++;
+        }
+
+
+    }
 
 
     /**

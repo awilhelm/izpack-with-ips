@@ -22,6 +22,7 @@ package com.izforge.izpack.compiler;
 
 import com.izforge.izpack.Pack;
 import com.izforge.izpack.PackFile;
+import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.util.FileUtil;
 import net.n3.nanoxml.XMLElement;
 import net.n3.nanoxml.XMLWriter;
@@ -428,6 +429,8 @@ public class Packager extends PackagerBase
             primaryJarStream.closeEntry();
         }
     }
+
+
 
     private Pack200.Packer createAgressivePack200Packer()
     {
