@@ -44,6 +44,7 @@ import net.n3.nanoxml.XMLElement;
 import com.izforge.izpack.CustomData;
 import com.izforge.izpack.Info;
 import com.izforge.izpack.Pack;
+import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.compiler.DynamicVariable;
 import com.izforge.izpack.rules.Condition;
 import com.izforge.izpack.rules.RulesEngine;
@@ -149,6 +150,13 @@ public class InstallerBase
                 availablePacks.add(pk);
             }
         }
+        objIn.close();
+
+        // We read the IPS Packs data
+        in = InstallerBase.class.getResourceAsStream("/ips-packs.info");
+        objIn = new ObjectInputStream(in);
+
+        installdata.IPSPacks = (List<IPSPack>) objIn.readObject();
         objIn.close();
 
         // We determine the operating system and the initial installation path

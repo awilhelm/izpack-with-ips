@@ -622,6 +622,9 @@
             <include name="com/izforge/izpack/panels/PacksPanelInterface.java"/>
             <include name="com/izforge/izpack/panels/PacksPanelAutomationHelper.java"/>
         </build-panel>
+        <build-panel name="IPSPanel">
+            <include name="com/izforge/izpack/panels/IPSPanel.java"/>
+        </build-panel>
         <build-panel name="HTMLLicencePanel">
             <include name="com/izforge/izpack/panels/HTMLLicencePanel.java"/>
         </build-panel>

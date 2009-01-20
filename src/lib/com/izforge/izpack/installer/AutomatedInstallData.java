@@ -22,6 +22,7 @@ package com.izforge.izpack.installer;
 import com.izforge.izpack.Info;
 import com.izforge.izpack.LocaleDatabase;
 import com.izforge.izpack.Pack;
+import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.rules.RulesEngine;
 
 import net.n3.nanoxml.XMLElement;
@@ -105,6 +106,17 @@ public class AutomatedInstallData
      */
     public List selectedPacks;
 
+     /**
+     * The available IPS Packs.
+     */
+    public List<IPSPack> IPSPacks;
+
+    /**
+     * The selected IPS Packs.
+     */
+    public List<IPSPack> selectedIPSPacks;
+
+
     /**
      * The panels list.
      */
@@ -176,6 +188,8 @@ public class AutomatedInstallData
     {
         availablePacks = new ArrayList();
         selectedPacks = new ArrayList();
+        IPSPacks = new ArrayList();
+        selectedIPSPacks = new ArrayList();          
         panels = new ArrayList<IzPanel>();
         panelsOrder = new ArrayList();
         xmlData = new XMLElement("AutomatedInstallation");

@@ -417,22 +417,10 @@ public abstract class PackagerBase implements IPackager
     protected void writeIPSPacks() throws Exception
     {
         final int num = IPSpacksList.size();
-        sendMsg("Writing " + num + " IPS Pack" + (num > 1 ? "s" : "") + " into installer");
-
-        int packNumber = 0;
-        Iterator<IPSPack> packIter = IPSpacksList.iterator();
+        sendMsg("Writing " + num + " IPS Pack" + (num > 1 ? "s" : "") + " into installer.");
 
         // Each IPS Pack information is added to the installer
-        while (packIter.hasNext())
-        {
-            IPSPack ipsPack = packIter.next();
-
-            writeInstallerObject("ips/" + (packNumber+1), ipsPack);
-
-            packNumber++;
-        }
-
-
+        writeInstallerObject("ips-packs.info", IPSpacksList);
     }
 
 
