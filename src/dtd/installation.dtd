@@ -200,6 +200,7 @@ $Id$
 <!-- The ips-pack section (indicates the IPS packs to create) -->
     <!ELEMENT ips-pack (description, include*, exclude*)>
 	    <!ATTLIST ips-pack src CDATA #REQUIRED>
+	    <!ATTLIST ips-pack checked CDATA #REQUIRED>
 
 <!-- Allows the inclusion in the installer or uninstaller of a native library -->
 <!ELEMENT native (os*)>

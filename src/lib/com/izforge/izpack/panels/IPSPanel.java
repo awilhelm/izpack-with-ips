@@ -102,9 +102,7 @@ public class IPSPanel extends IzPanel
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JLabel select=new JLabel("Sélectionnez les packs IPS à installer :");
-
-
-        int i=0;
+        
 
         add(select, NEXT_LINE);
 
@@ -115,7 +113,7 @@ public class IPSPanel extends IzPanel
 
             IPSPack ipsPack = packIter.next();
 
-            Checkbox atemp=new Checkbox(ipsPack.getDescription());
+            Checkbox atemp=new Checkbox(ipsPack.getDescription(), ipsPack.getCheckedByDefault());
 
             add(atemp, NEXT_LINE);
 
