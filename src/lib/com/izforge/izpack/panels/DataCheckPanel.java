@@ -29,6 +29,7 @@
 package com.izforge.izpack.panels;
 
 import com.izforge.izpack.Pack;
+import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.installer.IzPanel;
@@ -126,6 +127,34 @@ public class DataCheckPanel extends IzPanel
         return sOutput;
     }
 
+     /**
+     * Get and return the list of IPS pack names.
+     *
+     * @param packList
+     * @return String
+     */
+    private String getIPSPackNames(List<IPSPack> packList)
+    {
+        int i;
+        String pStatus;
+        String sOutput = "";
+        IPSPack iPack;
+        for (i = 0; i < packList.size(); i++)
+        {
+            iPack = packList.get(i);
+            if (iData.selectedIPSPacks.indexOf(iPack) != -1)
+            {
+                pStatus = "Selected";
+            }
+            else
+            {
+                pStatus = "Unselected";
+            }
+            sOutput = sOutput + "\t" + i + ": " + iPack.getName() + " (" + pStatus + ")\n";
+        }
+        return sOutput;
+    }
+
     /**
      * Print list of variables names and value, as well as the list
      * of packages and their status (selected or not).
@@ -150,6 +179,7 @@ public class DataCheckPanel extends IzPanel
             sInfo = sInfo + "\tName: " + alphaName[i] + ", Value: " + varList.getProperty(alphaName[i]) + "\n";
         }
         sInfo = sInfo + "\nAvailable Packs: \n" + getPackNames(iData.allPacks) + "\n";
+        sInfo = sInfo + "\nAvailable IPS Packs: \n" + getIPSPackNames(iData.IPSPacks) + "\n";  
         System.out.println(sInfo);
         staticText.setText(sInfo);
     }

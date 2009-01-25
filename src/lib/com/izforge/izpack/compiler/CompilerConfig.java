@@ -1132,6 +1132,7 @@ public class CompilerConfig extends Thread
             XMLElement el = IPSPackIter.next();
 
             String src = requireAttribute(el, "src");
+            String name = requireAttribute(el, "name");
             boolean checked = Boolean.valueOf(requireAttribute(el, "checked")).booleanValue();
             String description = requireChildNamed(el, "description").getContent();
             String version = el.getAttribute("version");
@@ -1163,7 +1164,7 @@ public class CompilerConfig extends Thread
 
 
             // New instance for the pack
-            IPSPack newIpsPack = new IPSPack(src, description, version, checked, includes, excludes);
+            IPSPack newIpsPack = new IPSPack(src, name, description, version, checked, includes, excludes);
 
             compiler.addIPSPack(newIpsPack);
 

@@ -19,6 +19,7 @@
     <str id="JDKPathPanel.headline" txt="Chemin du JDK"/>
     <str id="LicencePanel.headline" txt="Accords de Licence"/>
     <str id="PacksPanel.headline" txt="Sélection des paquets à installer"/>
+    <str id="PacksPanel.headline" txt="Sélection des paquets IPS à installer"/>
     <str id="ProcessPanel.headline" txt="Execution de processus externes"/>
     <str id="ShortcutPanel.headline" txt="Configuration des raccourcis"/>
     <str id="SimpleFinishPanel.headline" txt="Installation Terminée"/>
@@ -105,7 +106,10 @@
     <str id="PacksPanel.excludes" txt="Exclusions: "/>
     <str id="PacksPanel.notEnoughSpace" txt="L'espace disque disponible est insuffisant."/>
     <str id="PacksPanel.notAscertainable" txt="incertain"/>
-		
+
+    <!-- IPSPanel strings -->
+    <str id="IPSPanel.description" txt="Description"/>
+
     <!-- InstallPanel strings -->
     <str id="InstallPanel.info" txt="Vous pouvez lancer le processus d'installation ici :"/>
     <str id="InstallPanel.install" txt="Installer !"/>

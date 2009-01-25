@@ -18,6 +18,10 @@ public class IPSPack implements Serializable
     // True if the pack will be checked in the list of the installer
     private boolean checkedByDefault;
 
+
+    // Name of the pack
+    private String name;
+
     // Description of the pack
     private String description;
 
@@ -29,15 +33,26 @@ public class IPSPack implements Serializable
 
 
     // Constructor
-    public IPSPack(String inRepositoryAddress, String inDescription, String inVersion, boolean inCheckedByDefault, String inIncludes[], String inExcludes[])
+    public IPSPack(String inRepositoryAddress, String inName, String inDescription, String inVersion, boolean inCheckedByDefault, String inIncludes[], String inExcludes[])
     {
         this.repositoryUri = inRepositoryAddress;
+        this.name = inName;
         this.description = inDescription;
         this.version = inVersion;
         this.checkedByDefault = inCheckedByDefault;
 
         this.includes = inIncludes;
         this.excludes = inExcludes;
+    }
+
+    public String getVersion()
+    {
+        return version;
+    }
+
+    public String getName()
+    {
+        return name;
     }
 
     public String getDescription()

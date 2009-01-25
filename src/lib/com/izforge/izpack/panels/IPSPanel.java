@@ -11,9 +11,19 @@ import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.util.IoHelper;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.CellRendererPane;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -22,7 +32,7 @@ import java.util.Iterator;
  * Time: 21:48:59
  * To change this template use File | Settings | File Templates.
  */
-public class IPSPanel extends IzPanel
+public class IPSPanel extends IzPanel implements ListSelectionListener/*, ChangeListener*/
 {
 
     /**
@@ -48,38 +58,113 @@ public class IPSPanel extends IzPanel
         this(parent, idata, new IzPanelLayout());
     }
 
-
-     /**
-     * Creates the table for the packs. All parameters are required. The table will be returned.
-     *
-     * @param width       of the table
-     * @param scroller    the scroller to be used
-     * @param layout      layout to be used
-     * @param constraints constraints to be used
-     * @return the created table
+    /*
+     * JTable Table Model
      */
-    protected JTable createPacksTable(int width, JScrollPane scroller, GridBagLayout layout,
-                                      GridBagConstraints constraints)
+    class IPSTableModel extends AbstractTableModel
     {
-        JTable table = new JTable();
-        table.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
-        table.setIntercellSpacing(new Dimension(0, 0));
-        table.setBackground(Color.white);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        //table.getSelectionModel().addListSelectionListener(this);
-        table.setShowGrid(false);
-        scroller.setViewportView(table);
-        scroller.setAlignmentX(LEFT_ALIGNMENT);
-        scroller.getViewport().setBackground(Color.white);
-        scroller.setPreferredSize(new Dimension(width, (idata.guiPrefs.height / 3 + 30)));
+            private String[] columnNames;
+            private Object[][] data;
 
-        if (layout != null && constraints != null)
-        {
-            layout.addLayoutComponent(scroller, constraints);
-        }
-        add(scroller);
-        return (table);
+            public IPSTableModel(String[] inCol, Object[][] inData)
+            {
+                columnNames=inCol;
+                data=inData;
+            }
+
+            public int getColumnCount()
+            {
+                return columnNames.length;
+            }
+
+            public int getRowCount()
+            {
+                return data.length;
+            }
+
+            public String getColumnName(int col)
+            {
+                return columnNames[col];
+            }
+
+            public Object getValueAt(int row, int col)
+            {
+                return data[row][col];
+            }
+
+            /*
+             * Used for the default renderer (JCheckBox for boolean)
+             */
+            public Class getColumnClass(int c)
+            {
+                return getValueAt(0, c).getClass();
+            }
+
+            public boolean isCellEditable(int row, int col)
+            {
+                // Only the first column is editable
+                if (col == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            public void setValueAt(Object value, int row, int col)
+            {
+                data[row][col] = value;
+                fireTableCellUpdated(row, col);
+            }
     }
+
+    /*
+     * Make the layout, not definitive
+     */
+    public void createLayout(Object[][] data)
+    {
+
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        headLineLabel=new JLabel(parent.langpack.getString("IPSPanel.headline"));
+        headLineLabel.setAlignmentX(LEFT_ALIGNMENT);
+        add(headLineLabel, NEXT_LINE);
+
+        String[] columns = { "", "Name" };
+
+        //packsTable = new JTable(data, columns);
+        packsTable = new JTable(new IPSTableModel(columns, data));
+        packsTable.setIntercellSpacing(new Dimension(0, 0));
+        packsTable.setShowGrid(false);
+
+        //packsTable.getColumnModel().getColumn(0).setCellRenderer();
+        //packsTable.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(new JCheckBox()));
+        packsTable.getColumnModel().getColumn(0).setMaxWidth(30);
+
+        packsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        packsTable.getSelectionModel().addListSelectionListener(this);
+
+        packsTable.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+
+        tableScroller = new JScrollPane();
+        tableScroller.setViewportView(packsTable);
+
+        tableScroller.add(packsTable.getTableHeader())     ;
+        //tableScroller.getViewport().setBackground(Color.white);
+
+        add(tableScroller, NEXT_LINE);
+
+        descriptionArea = new JTextArea();
+        descriptionArea.setEditable(false);
+        descriptionArea.setBorder(BorderFactory.createTitledBorder(parent.langpack.getString("IPSPanel.description")));
+        descriptionArea.setRows(4);
+
+        add(descriptionArea, NEXT_LINE);
+
+    }
+
 
     /**
      * Creates a new IPSPanel object with the given layout manager.
@@ -94,34 +179,42 @@ public class IPSPanel extends IzPanel
 
         super(parent, idata, layout);
 
-        //tableScroller = new JScrollPane();
-        //packsTable = createPacksTable(300, tableScroller, null, null);
+        Object[][] data = new Object[idata.IPSPacks.size()][2];
 
+        // We make the data for the table
         Iterator<IPSPack> packIter = idata.IPSPacks.iterator();
-
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
-        JLabel select=new JLabel("Sélectionnez les packs IPS à installer :");
-        
-
-        add(select, NEXT_LINE);
-
-
-         while (packIter.hasNext())
-         {
-
-
+        for (int i=0;packIter.hasNext();i++)
+        {
             IPSPack ipsPack = packIter.next();
 
-            Checkbox atemp=new Checkbox(ipsPack.getDescription(), ipsPack.getCheckedByDefault());
+            data[i][0] = ipsPack.getCheckedByDefault();
+            data[i][1] = ipsPack.getName();
+        }
 
-            add(atemp, NEXT_LINE);
-
-         }
+        createLayout(data);
 
 
         // At end of layouting we should call the completeLayout method also they do nothing.
         getLayoutHelper().completeLayout();
+    }
+
+     /*
+     * (non-Javadoc)
+     *
+     * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+     */
+    public void valueChanged(ListSelectionEvent e)
+    {
+        IPSPack selectedPack = idata.IPSPacks.get(packsTable.getSelectedRow());
+        String desc=selectedPack.getDescription();
+
+        // If a version number is available, we display it
+        if (selectedPack.getVersion()!=null)
+        {
+            desc="Version : " + selectedPack.getVersion() + "\n" + desc;
+        }
+
+        descriptionArea.setText(desc);
     }
 
 
@@ -133,6 +226,30 @@ public class IPSPanel extends IzPanel
     public boolean isValidated()
     {
         return true;
+    }
+
+    /*
+     * Called when the user goes to the next panel
+     */
+    public void panelDeactivate()
+    {
+        // if the user has pressed the previous button, some packs may have been added yet, so we clear the list
+        idata.selectedIPSPacks.clear();
+
+        // for each pack, we check if it has been selected and add it to the selected list or not
+        Iterator<IPSPack> packIter = idata.IPSPacks.iterator();
+        for (int i=0;packIter.hasNext();i++)
+        {
+
+            IPSPack ipsPack = packIter.next();
+
+            if (packsTable.getValueAt(i,0).equals(true))
+            {
+                idata.selectedIPSPacks.add(ipsPack);
+            }
+
+        }
+
     }
 
 }

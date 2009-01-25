@@ -1183,6 +1183,10 @@
             depends="all, generate.installer"
             description="makes a installer without docu"/>
 
+    <target name="ips_dev"
+            depends="all, prepare.install.dist"
+            description="makes a installer without docu"/>
+
     <!-- Makes everything, from compilation, customer and javadoc to generating an installer. -->
     <target name="dist"
             depends="src.tar.gz, all, create.docu, generate.installer"

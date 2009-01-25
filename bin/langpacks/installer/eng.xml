@@ -19,6 +19,7 @@
     <str id="JDKPathPanel.headline" txt="JDK Path"/>
     <str id="LicencePanel.headline" txt="Licensing Agreements"/>
     <str id="PacksPanel.headline" txt="Select Installation Packages"/>
+    <str id="IPSPanel.headline" txt="Select IPS Installation Packages"/>
     <str id="ProcessPanel.headline" txt="Perform External Processes"/>
     <str id="ShortcutPanel.headline" txt="Setup Shortcuts"/>
     <str id="SimpleFinishPanel.headline" txt="Installation Finished"/>
@@ -105,9 +106,12 @@
     <str id="PacksPanel.excludes" txt="Excludes: "/>
     <str id="PacksPanel.notEnoughSpace" txt="Disk space required for the installation exceeds available disk space."/>
     <str id="PacksPanel.notAscertainable" txt="not ascertainable"/>
-		
-		<!-- InstallPanel strings -->
-		<str id="InstallPanel.info" txt="Click 'Install!' to begin the installation process"/>
+
+     <!-- IPSPanel strings -->
+    <str id="IPSPanel.description" txt="Description"/>
+
+	<!-- InstallPanel strings -->
+	<str id="InstallPanel.info" txt="Click 'Install!' to begin the installation process"/>
     <str id="InstallPanel.install" txt="Install!"/>
     <str id="InstallPanel.tip" txt="Pack installation progress:"/>
     <str id="InstallPanel.begin" txt=" "/>
