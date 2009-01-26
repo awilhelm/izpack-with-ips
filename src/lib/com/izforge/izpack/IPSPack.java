@@ -60,7 +60,7 @@ public class IPSPack implements Serializable
        return description;
     }
 
-    public boolean getCheckedByDefault()
+    public boolean isCheckedByDefault()
     {
        return checkedByDefault;
     }

@@ -1133,7 +1133,7 @@ public class CompilerConfig extends Thread
 
             String src = requireAttribute(el, "src");
             String name = requireAttribute(el, "name");
-            boolean checked = Boolean.valueOf(requireAttribute(el, "checked")).booleanValue();
+            boolean checked = Boolean.valueOf(requireAttribute(el, "checked"));
             String description = requireChildNamed(el, "description").getContent();
             String version = el.getAttribute("version");
 

@@ -32,7 +32,7 @@ import java.util.Vector;
  * Time: 21:48:59
  * To change this template use File | Settings | File Templates.
  */
-public class IPSPanel extends IzPanel implements ListSelectionListener/*, ChangeListener*/
+public class IPSPanel extends IzPanel implements ListSelectionListener
 {
 
     /**
@@ -45,7 +45,11 @@ public class IPSPanel extends IzPanel implements ListSelectionListener/*, Change
      */
     protected JTable packsTable;
 
+    /*
+     * The scrollers components
+     */
     protected JScrollPane tableScroller;
+    protected JScrollPane descriptionScroller;
 
      /**
      * The constructor.
@@ -121,47 +125,43 @@ public class IPSPanel extends IzPanel implements ListSelectionListener/*, Change
     }
 
     /*
-     * Make the layout, not definitive
+     * Make the layout
      */
     public void createLayout(Object[][] data)
     {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
+        // Display the Headline label
         headLineLabel=new JLabel(parent.langpack.getString("IPSPanel.headline"));
         headLineLabel.setAlignmentX(LEFT_ALIGNMENT);
-        add(headLineLabel, NEXT_LINE);
 
-        String[] columns = { "", "Name" };
+        add(headLineLabel);
 
-        //packsTable = new JTable(data, columns);
-        packsTable = new JTable(new IPSTableModel(columns, data));
+        // Display the packs list
+        packsTable = new JTable(new IPSTableModel(new String[] { "", "Name" }, data));
         packsTable.setIntercellSpacing(new Dimension(0, 0));
         packsTable.setShowGrid(false);
-
-        //packsTable.getColumnModel().getColumn(0).setCellRenderer();
-        //packsTable.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(new JCheckBox()));
-        packsTable.getColumnModel().getColumn(0).setMaxWidth(30);
-
+        packsTable.getColumnModel().getColumn(0).setMaxWidth(30); // checkboxes column
         packsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         packsTable.getSelectionModel().addListSelectionListener(this);
-
         packsTable.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
 
         tableScroller = new JScrollPane();
         tableScroller.setViewportView(packsTable);
 
-        tableScroller.add(packsTable.getTableHeader())     ;
-        //tableScroller.getViewport().setBackground(Color.white);
+        add(tableScroller);
 
-        add(tableScroller, NEXT_LINE);
-
+        // Display the description of a pack
         descriptionArea = new JTextArea();
         descriptionArea.setEditable(false);
-        descriptionArea.setBorder(BorderFactory.createTitledBorder(parent.langpack.getString("IPSPanel.description")));
-        descriptionArea.setRows(4);
+        descriptionArea.setLineWrap(true);
+        descriptionScroller = new JScrollPane();
+        descriptionScroller.setMinimumSize(new Dimension(this.getWidth(), 150));
+        descriptionScroller.setBorder(BorderFactory.createTitledBorder(parent.langpack.getString("IPSPanel.description")));
+        descriptionScroller.setViewportView(descriptionArea);
 
-        add(descriptionArea, NEXT_LINE);
+        add(descriptionScroller);
 
     }
 
@@ -181,13 +181,13 @@ public class IPSPanel extends IzPanel implements ListSelectionListener/*, Change
 
         Object[][] data = new Object[idata.IPSPacks.size()][2];
 
-        // We make the data for the table
+        // We make the data for the packs table
         Iterator<IPSPack> packIter = idata.IPSPacks.iterator();
         for (int i=0;packIter.hasNext();i++)
         {
             IPSPack ipsPack = packIter.next();
 
-            data[i][0] = ipsPack.getCheckedByDefault();
+            data[i][0] = ipsPack.isCheckedByDefault();
             data[i][1] = ipsPack.getName();
         }
 
@@ -205,15 +205,17 @@ public class IPSPanel extends IzPanel implements ListSelectionListener/*, Change
      */
     public void valueChanged(ListSelectionEvent e)
     {
+        // Get the description
         IPSPack selectedPack = idata.IPSPacks.get(packsTable.getSelectedRow());
         String desc=selectedPack.getDescription();
 
-        // If a version number is available, we display it
+        // If a version number is available, we add it before the description
         if (selectedPack.getVersion()!=null)
         {
             desc="Version : " + selectedPack.getVersion() + "\n" + desc;
         }
 
+        // Put the description in the Textarea
         descriptionArea.setText(desc);
     }
 

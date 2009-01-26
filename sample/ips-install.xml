@@ -16,13 +16,13 @@
         The meaning of the tags should be natural ...
     -->
     <info>
-        <appname>Sample Installation</appname>
-        <appversion>1.4 beta 666</appversion>
+        <appname>IPS Installation Demo</appname>
+        <appversion>0.1</appversion>
         <authors>
-            <author name="JPz" email="jpz@superman.org"/>
-            <author name="Hidden Man" email="hidden@hisdomain.com"/>
+            <author name="Alexis Wilhelm" email="alexis.wilhelm@poste.isima.fr"/>
+            <author name="Romain Tertiaux" email="romain.tertiaux@poste.isima.fr"/>
         </authors>
-        <url>http://www.anotherworld-inspace-website.net/</url>
+        <url>http://izpack-students-contrib.lighthouseapp.com/projects/18654-izpack-ips-integration/overview</url>
     </info>
 
     <!--
@@ -60,7 +60,7 @@
         <panel classname="InfoPanel"/>
         <panel classname="LicencePanel"/>
         <panel classname="TargetPanel"/>
-        <panel classname="PacksPanel"/>            
+        <panel classname="PacksPanel"/>
         <panel classname="InstallPanel"/>
         <panel classname="FinishPanel"/>
     </panels>
@@ -91,7 +91,10 @@
             <description>This pack contains nothing and it is checked by default.</description>
         </ips-pack>
         <ips-pack name="IPS Pack 2" src="http://another_repository.com/..." checked="false">
-            <description>A second IPS Pack which is not checked by default.</description>
+            <description>A second IPS Pack which is not checked by default. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description.This pack has also a very big description.This pack has also a very big description.</description>
+        </ips-pack>
+        <ips-pack name="IPS Pack 3" src="http://another_repository.com/..." checked="false">
+            <description>A third IPS Package with a real remote repository.</description>
         </ips-pack>
     </packs>
 
