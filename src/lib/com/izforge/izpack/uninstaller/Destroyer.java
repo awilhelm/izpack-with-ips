@@ -150,7 +150,6 @@ public class Destroyer extends Thread
                     {
                         img.uninstallPackages(new String[] {b.fmri.getName()});
                         handler.progress(i++, "Uninstalling of " + b.fmri.getName());
-                        handler.emitWarning("coucou", b.fmri.getName());
                     }
 
 

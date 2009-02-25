@@ -54,14 +54,18 @@
         We indicate here which panels we want to use. The order will be respected.
     -->
     <panels>
-        <panel classname="IPSPanel"/>
-        <panel classname="DataCheckPanel"/>
-        <panel classname="HelloPanel"/>
+
+        <!--<panel classname="HelloPanel"/>
         <panel classname="InfoPanel"/>
-        <panel classname="LicencePanel"/>
+        <panel classname="LicencePanel"/>-->
         <panel classname="TargetPanel"/>
         <panel classname="PacksPanel"/>
+        <panel classname="IPSPanel"/>
+        <!--<panel classname="DataCheckPanel"/>       -->
+        <panel classname="IPSInstallPanel"/>
+        <!--<panel classname="IPSUpdatePanel"/>--> 
         <panel classname="InstallPanel"/>
+        <panel classname="IPSInstallPanel"/>
         <panel classname="FinishPanel"/>
     </panels>
 
@@ -87,14 +91,16 @@
             <description>The sources</description>
             <file src="src" targetdir="$INSTALL_PATH"/>
         </pack>
-        <ips-pack name="IPS Pack 1" src="http://a_repository.com/..." checked="true" version="1.0">
+        <ips-pack name="IPS Pack 1" src="http://a_repository.com/..." checked="false" version="1.0">
             <description>This pack contains nothing and it is checked by default.</description>
         </ips-pack>
         <ips-pack name="IPS Pack 2" src="http://another_repository.com/..." checked="false">
             <description>A second IPS Pack which is not checked by default. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description. This pack has also a very big description.This pack has also a very big description.This pack has also a very big description.</description>
         </ips-pack>
-        <ips-pack name="IPS Pack 3" src="http://another_repository.com/..." checked="false">
+        <ips-pack name="IPS Pack 3" src="http://pkg.sun.com/glassfish/v3prelude/release/" checked="true">
             <description>A third IPS Package with a real remote repository.</description>
+            <include name="felix"/>
+            <include name="glassfish-api"/>
         </ips-pack>
     </packs>
 

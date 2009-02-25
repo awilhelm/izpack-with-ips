@@ -4,26 +4,14 @@ import com.izforge.izpack.installer.IzPanel;
 import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.gui.IzPanelLayout;
-import com.izforge.izpack.gui.LabelFactory;
-import com.izforge.izpack.gui.LayoutConstants;
-import com.izforge.izpack.Info;
 import com.izforge.izpack.IPSPack;
-import com.izforge.izpack.util.IoHelper;
 
 import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.CellRendererPane;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -107,14 +95,7 @@ public class IPSPanel extends IzPanel implements ListSelectionListener
             public boolean isCellEditable(int row, int col)
             {
                 // Only the first column is editable
-                if (col == 0)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return (col == 0);
             }
 
             public void setValueAt(Object value, int row, int col)
@@ -129,6 +110,7 @@ public class IPSPanel extends IzPanel implements ListSelectionListener
      */
     public void createLayout(Object[][] data)
     {
+
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 

@@ -307,5 +307,14 @@
       </value>
     </option>
   </component>
+  <component name="libraryTable">
+    <library name="pkg">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/pkg-client.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+  </component>
 </project>
 
