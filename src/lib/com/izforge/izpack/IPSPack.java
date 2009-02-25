@@ -1,71 +1,138 @@
+/*
+ * Copyright 2009 Alexis Wilhelm. This program is free software: you can do
+ * anything, but lay off of my blue suede shoes.
+ */
+
 package com.izforge.izpack;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
- * This class keeps the information about an IPS Pack.
- *
+ * A pack useful for installing IPS packages.
+ * 
+ * @author Alexis Wilhelm
+ * @since January 2009
  */
-public class IPSPack implements Serializable
-{
+public class IPSPack implements Serializable {
 
-    // Address of the remote IPS repository
-    private String repositoryUri;
+	/**
+	 * Allow this pack to get serialized.
+	 */
+	private static final long serialVersionUID = 1L;
 
-    // Version that the installer will try to get, if available
-    private String version;
+	/**
+	 * The origin URL for this pack's authority.
+	 */
+	private URL authority;
 
-    // True if the pack will be checked in the list of the installer
-    private boolean checkedByDefault;
+	/**
+	 * This pack's name.
+	 */
+	private String name;
 
+	/**
+	 * A list of wanted and unwanted packages.
+	 */
+	private List<Clude> cludes;
 
-    // Name of the pack
-    private String name;
+	/**
+	 * The version that the installer will try to get, if available.
+	 */
+	private String version;
 
-    // Description of the pack
-    private String description;
+	/**
+	 * The description of this pack's.
+	 */
+	private String description;
 
-    // Files from the repository we want to include
-    private String includes[];
+	/**
+	 * Whether this pack is checked by default in the installer's pack list.
+	 */
+	private Boolean checked;
 
-    // Files from the repository we want to exclude
-    private String excludes[];
+	/**
+	 * @param authority The authority for this pack.
+	 * @param name This pack's name.
+	 * @param description This pack's description.
+	 * @param version This pack's version. It can be null if you just don't care
+	 *        about it.
+	 * @param checked Whether this pack will be initially checked or not.
+	 * @param cludes A list of cludes defining the packages this pack requires.
+	 * @throws MalformedURLException When the URL given for this pack's
+	 *         authority is invalid.
+	 */
+	public IPSPack (String authority, String name, String description,
+			String version, Boolean checked, List<Clude> cludes)
+			throws MalformedURLException {
+		this.name = name;
+		this.description = description;
+		this.version = version;
+		this.checked = checked;
+		this.authority = new URL(authority);
+		this.cludes = cludes;
+	}
 
+	/**
+	 * @return The origin URL for this pack's authority.
+	 */
+	public URL getAuthority () {
+		return authority;
+	}
 
-    // Constructor
-    public IPSPack(String inRepositoryAddress, String inName, String inDescription, String inVersion, boolean inCheckedByDefault, String inIncludes[], String inExcludes[])
-    {
-        this.repositoryUri = inRepositoryAddress;
-        this.name = inName;
-        this.description = inDescription;
-        this.version = inVersion;
-        this.checkedByDefault = inCheckedByDefault;
+	/**
+	 * @return The description of this pack's.
+	 */
+	public String getDescription () {
+		return description;
+	}
 
-        this.includes = inIncludes;
-        this.excludes = inExcludes;
-    }
+	/**
+	 * @return This pack's name.
+	 */
+	public String getName () {
+		return name;
+	}
 
-    public String getVersion()
-    {
-        return version;
-    }
+	/**
+	 * Get every package this pack requires.
+	 * 
+	 * @param candidates A set of all available packages.
+	 * @return An array filled with names of the packages this pack requires.
+	 */
+	public String[] getPackages (Collection<String> candidates) {
+		/*
+		 * Start with an empty set if the first clude describes an inclusion,
+		 * and with every available packages if the first clude is an exclusion
+		 * or if there is no clude at all.
+		 */
+		Collection<String> pkgset = !cludes.isEmpty()
+				&& cludes.get(0).isIncluded()? new HashSet<String>()
+				: new HashSet<String>(candidates);
+		/*
+		 * Refine the set according to every cludes.
+		 */
+		for (Clude c: cludes)
+			c.filter(pkgset, candidates);
+		return pkgset.toArray(new String[0]);
+	}
 
-    public String getName()
-    {
-        return name;
-    }
+	/**
+	 * @return The version that the installer will try to get, if available.
+	 */
+	public String getVersion () {
+		return version;
+	}
 
-    public String getDescription()
-    {
-       return description;
-    }
-
-    public boolean isCheckedByDefault()
-    {
-       return checkedByDefault;
-    }
-
-
-
-
+	/**
+	 * @return True when this pack will be initially checked in the installer's
+	 *         pack list, false otherwise.
+	 */
+	public Boolean isCheckedByDefault () {
+		return checked;
+	}
 }

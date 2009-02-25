@@ -150,7 +150,7 @@ public class DataCheckPanel extends IzPanel
             {
                 pStatus = "Unselected";
             }
-            sOutput = sOutput + "\t" + i + ": " + iPack.getName() + " (" + pStatus + ")\n";
+            sOutput = sOutput + "\t" + i + ": " + iPack.getName() + "\n";
         }
         return sOutput;
     }

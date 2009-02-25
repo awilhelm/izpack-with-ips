@@ -75,6 +75,7 @@ import com.izforge.izpack.*;
 import com.izforge.izpack.compiler.Compiler.CmdlinePackagerListener;
 import com.izforge.izpack.event.CompilerListener;
 import com.izforge.izpack.installer.DataValidator;
+import com.izforge.izpack.installer.IPSUnpacker;
 import com.izforge.izpack.installer.InstallerRequirement;
 import com.izforge.izpack.panels.HelpWindow;
 import com.izforge.izpack.rules.Condition;
@@ -1122,60 +1123,83 @@ public class CompilerConfig extends Thread
                 addPacksSingle(refXMLData);
             }
         }
+        
+        addIPSPacksSingle(root);
+        
         notifyCompilerListener("addPacksSingle", CompilerListener.END, data);
-
-        notifyCompilerListener("addIPSPacks", CompilerListener.BEGIN, data);
-
-        Iterator<XMLElement> IPSPackIter = IPSPackElements.iterator();
-        while (IPSPackIter.hasNext())
-        {
-            XMLElement el = IPSPackIter.next();
-
-            String src = requireAttribute(el, "src");
-            String name = requireAttribute(el, "name");
-            boolean checked = Boolean.valueOf(requireAttribute(el, "checked"));
-            String description = requireChildNamed(el, "description").getContent();
-            String version = el.getAttribute("version");
-
-            // get includes and excludes
-            Vector<XMLElement> xcludesList = null;
-            String[] includes = null;
-            xcludesList = el.getChildrenNamed("include");
-            if (!xcludesList.isEmpty())
-            {
-                includes = new String[xcludesList.size()];
-                for (int j = 0; j < xcludesList.size(); j++)
-                {
-                    XMLElement xclude = xcludesList.get(j);
-                    includes[j] = requireAttribute(xclude, "name");
-                }
-            }
-            String[] excludes = null;
-            xcludesList = el.getChildrenNamed("exclude");
-            if (!xcludesList.isEmpty())
-            {
-                excludes = new String[xcludesList.size()];
-                for (int j = 0; j < xcludesList.size(); j++)
-                {
-                    XMLElement xclude = xcludesList.get(j);
-                    excludes[j] = requireAttribute(xclude, "name");
-                }
-            }
-
-
-            // New instance for the pack
-            IPSPack newIpsPack = new IPSPack(src, name, description, version, checked, includes, excludes);
-
-            compiler.addIPSPack(newIpsPack);
-
-
-        }
-
-        notifyCompilerListener("addIPSPacks", CompilerListener.END, data);
-
-
-
     }
+
+	/**
+	 * Add IPS packs to the installer without checking the dependencies and
+	 * includes.
+	 * 
+	 * @param data The root &lt;packs&gt; element, containing everything we need
+	 *        to know about the packs we're to install.
+	 * @throws CompilerException When anything goes wrong with the compilation.
+	 * @author Alexis Wilhelm
+	 * @since January 2009
+	 */
+	private void addIPSPacksSingle (XMLElement data) throws CompilerException {
+		/*
+		 * Let's begin!
+		 */
+		notifyCompilerListener("addIPSPacks", CompilerListener.BEGIN, data);
+		/*
+		 * Get each IPS pack described in the XML descriptor.
+		 */
+		Vector<XMLElement> packs = data.getChildrenNamed("ips-pack");
+		/*
+		 * Add the resources we need. Those include the empty IPS image and the
+		 * pkg Java API.
+		 */
+		if (packs.size() > 0) {
+			try {
+				compiler.addResource(IPSUnpacker.template, new File(
+						Compiler.IZPACK_HOME, "emptyimage.zip").toURI().toURL());
+				compiler.addJarContent(new File(Compiler.IZPACK_HOME,
+						"lib/pkg-client.jar").toURI().toURL());
+			}
+			catch (MalformedURLException e) {
+				throw new CompilerException("Resource not found: "
+						+ e.getLocalizedMessage());
+			}
+		}
+		for (XMLElement pack: packs) {
+			/*
+			 * Build the package requirements. This means, we create a new clude
+			 * for each <include> or <exclude> element in the pack and add it to
+			 * the pack's clude list.
+			 */
+			List<Clude> cludes = new ArrayList<Clude>();
+			Vector<XMLElement> nodes = pack.getChildren();
+			for (XMLElement element: nodes) {
+				String tagname = element.getName();
+				String pattern = element.getAttribute("name");
+				if (tagname.equals("include")) cludes.add(new Clude(pattern,
+						true));
+				else if (tagname.equals("exclude")) cludes.add(new Clude(
+						pattern, false));
+			}
+			try {
+				/*
+				 * Add a new IPSPack to the list.
+				 */
+				compiler.addIPSPack(new IPSPack(requireAttribute(pack, "src"),
+						requireAttribute(pack, "name"), requireChildNamed(pack,
+								"description").getContent(),
+						pack.getAttribute("version"),
+						Boolean.valueOf(pack.getAttribute("checked")), cludes));
+			}
+			catch (MalformedURLException e) {
+				throw new CompilerException(
+						"Invalid authority URL in this pack.");
+			}
+		}
+		/*
+		 * Over.
+		 */
+		notifyCompilerListener("addIPSPacks", CompilerListener.END, data);
+	}
 
     private XMLElement readRefPackData(String refFileName, boolean isselfcontained)
             throws CompilerException
@@ -1627,7 +1651,7 @@ public class CompilerConfig extends Thread
                     os = new BufferedOutputStream(outFile);
                     // and specify the substituted file to be added to the
                     // packager
-                    url = parsedFile.toURL();
+                    url = parsedFile.toURI().toURL();
                 }
 
                 if (parsexml)
@@ -2157,7 +2181,7 @@ public class CompilerConfig extends Thread
             File file = new File(filename).getAbsoluteFile();
             assertIsNormalReadableFile(file, "Configuration file");
             reader = new StdXMLReader(new FileInputStream(filename));
-            reader.setSystemID(file.toURL().toExternalForm());
+            reader.setSystemID(file.toURI().toURL().toExternalForm());
             // add izpack built in property
             compiler.setProperty("izpack.file", file.toString());
         }
@@ -2263,7 +2287,7 @@ public class CompilerConfig extends Thread
 
         try
         {
-            url = resource.toURL();
+            url = resource.toURI().toURL();
         }
         catch (MalformedURLException how)
         {
@@ -2309,7 +2333,7 @@ public class CompilerConfig extends Thread
             {
                 try
                 {
-                    url = resource.toURL();
+                    url = resource.toURI().toURL();
                 }
                 catch (MalformedURLException how)
                 {
@@ -2568,7 +2592,7 @@ public class CompilerConfig extends Thread
         int exitCode = 1;
         String home = ".";
         // We get the IzPack home directory
-        String izHome = System.getProperty("IZPACK_HOME");
+        String izHome = System.getProperty("izpack.home");
         if (izHome != null)
         {
             home = izHome;
@@ -2990,7 +3014,7 @@ public class CompilerConfig extends Thread
                         outFile.close();
                     }
                 }
-                url = tf.toURL();
+                url = tf.toURI().toURL();
 
             }
             // Use the class loader of the interface as parent, else
@@ -3152,7 +3176,7 @@ public class CompilerConfig extends Thread
                     os = null;
 
                     // getting the URL to the new merged file
-                    mergedPackLangFileURL = mergedPackLangFile.toURL();
+                    mergedPackLangFileURL = mergedPackLangFile.toURI().toURL();
                 }
 
                 compiler.addResource(id, mergedPackLangFileURL);

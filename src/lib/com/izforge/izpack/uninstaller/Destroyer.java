@@ -28,6 +28,8 @@ import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.FileExecutor;
 import com.izforge.izpack.util.OsVersion;
 import com.izforge.izpack.util.os.unix.ShellScript;
+import com.sun.pkg.client.Image;
+import com.sun.pkg.client.Fmri;
 
 import java.io.*;
 import java.util.*;
@@ -110,6 +112,7 @@ public class Destroyer extends Thread
                 handler.progress(i, file.getAbsolutePath());
             }
 
+
             // Custem action listener stuff --- afterDeletion ----
             informListeners(listeners[0], UninstallerListener.AFTER_DELETION, files, handler);
 
@@ -128,6 +131,40 @@ public class Destroyer extends Thread
             cleanup(new File(installPath));
 
             handler.stopAction();
+
+            /* deletion of IPS Packs */
+            try
+            {
+
+                Image img = new Image(new File(installPath));
+                List<Image.FmriState> fmrilist = img.getInventory(new String[0], false);
+
+                if (!fmrilist.isEmpty())
+                {
+                    handler.startAction("IPSDestroyer", fmrilist.size()-1);
+
+                    int i=0;
+
+                    /* Deletion pack after pack to be able to have a progress bar */
+                    for (Image.FmriState b: fmrilist)
+                    {
+                        img.uninstallPackages(new String[] {b.fmri.getName()});
+                        handler.progress(i++, "Uninstalling of " + b.fmri.getName());
+                        handler.emitWarning("coucou", b.fmri.getName());
+                    }
+
+
+                    handler.stopAction();
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                handler.emitWarning("Error", e.getMessage());            
+            }
+
+
         }
         catch (Exception err)
         {
@@ -245,6 +282,35 @@ public class Destroyer extends Thread
           idx++;
         }
         return result;
+    }
+
+     /**
+     * Returns an ArrayList of the installed IPS packages to delete.
+     *
+     * @return The files list.
+     * @throws Exception Description of the Exception
+     */
+    private List<String> getIPSPackagesList() throws Exception
+    {
+        // Initialisations
+        List<String> packages = new ArrayList<String>();
+        InputStream in = Destroyer.class.getResourceAsStream("/ips-install.log");
+        InputStreamReader inReader = new InputStreamReader(in);
+        BufferedReader reader = new BufferedReader(inReader);
+
+        // We skip the first line (which is blank, don't know why yet)
+        reader.readLine();
+
+        // We read it
+        String read = reader.readLine();
+        while (read != null)
+        {
+            packages.add(read.toString());
+            read = reader.readLine();
+        }
+
+        // We return it
+        return packages;
     }
 
     /**

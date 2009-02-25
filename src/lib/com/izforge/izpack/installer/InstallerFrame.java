@@ -104,6 +104,7 @@ import com.izforge.izpack.util.IoHelper;
 import com.izforge.izpack.util.Log;
 import com.izforge.izpack.util.OsConstraint;
 import com.izforge.izpack.util.VariableSubstitutor;
+import com.sun.pkg.client.Image;
 
 /**
  * The IzPack installer frame.
@@ -1036,6 +1037,20 @@ public class InstallerFrame extends JFrame
                 }
                 logWriter.flush();
             }
+            outJar.closeEntry();
+
+            // We write the ips packages log
+            outJar.putNextEntry(new ZipEntry("ips-install.log"));
+            logWriter = new BufferedWriter(new OutputStreamWriter(outJar));
+            logWriter.newLine();
+
+            for (Image.FmriState fmristate: installdata.installedIPSPackages)
+            {
+                logWriter.write(fmristate.fmri.getName());
+                logWriter.newLine();
+            }
+
+            logWriter.flush();
             outJar.closeEntry();
 
             // We write the uninstaller jar file log
