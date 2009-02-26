@@ -469,6 +469,7 @@
 	<!-- Compiles the uninstaller src files -->
 	<target name="compile.uninstaller" depends="prepare">
 		<javac srcdir="${src.dir}"
+               classpath="${basedir}/lib/pkg-client.jar"
 		       destdir="${build.dir}"
 		       optimize="on"
 		       source="${compat.source}"
@@ -485,6 +486,7 @@
 
 			<include name="com/izforge/izpack/uninstaller/*.java" />
 			<exclude name="com/izforge/izpack/gui/IzPackKMetalTheme.java" />
+            <include name="com/sun/pkg/client/*.java"/>
             <!--<include name="net/n3/nanoxml/*.java"/>-->
             <include name="com/izforge/izpack/adaptator/**/*.java"/>
             <include name="com/izforge/izpack/adaptator/*.java"/>
@@ -510,6 +512,9 @@
             	<include name="com/izforge/izpack/adaptator/*.class"/>
 				<include name="com/izforge/izpack/installer/PrivilegedRunner.class" />
 			</fileset>
+            <zipfileset src="${basedir}/lib/pkg-client.jar">
+                <include name="com/sun/pkg/client/*"/>
+            </zipfileset>
 			<fileset dir="${src.dir}">
 				<include name="com/izforge/izpack/installer/run-with-privileges-on-osx" />
 				<include name="com/izforge/izpack/installer/elevate.js" />
@@ -914,8 +919,7 @@
 		<sequential>
             <build-listener name="@{name}" srcdir="@{srcdir}" izeventExcludes="**/*Installer*"
                             classpath-ext="@{classpath-ext}">
-			                izeventExcludes="**/*Installer*">
-				<uninstaller-fileset />
+                <uninstaller-fileset />
 			</build-listener>
 		</sequential>
 	</macrodef>

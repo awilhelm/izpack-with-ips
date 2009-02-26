@@ -634,7 +634,7 @@ public class CompilerConfig extends Thread {
         Vector<IXMLElement> packElements = root.getChildrenNamed("pack");
         Vector<IXMLElement> refPackElements = root.getChildrenNamed("refpack");
         Vector<IXMLElement> refPackSets = root.getChildrenNamed("refpackset");
-        Vector<XMLElement> IPSPackElements = root.getChildrenNamed("ips-pack");
+        Vector<IXMLElement> IPSPackElements = root.getChildrenNamed("ips-pack");
 
         if (packElements.isEmpty() && refPackElements.isEmpty() && refPackSets.isEmpty() && IPSPackElements.isEmpty())
         {
@@ -1124,7 +1124,7 @@ public class CompilerConfig extends Thread {
 	 * @author Alexis Wilhelm
 	 * @since January 2009
 	 */
-	private void addIPSPacksSingle (XMLElement data) throws CompilerException {
+	private void addIPSPacksSingle (IXMLElement data) throws CompilerException {
 		/*
 		 * Let's begin!
 		 */
@@ -1132,7 +1132,7 @@ public class CompilerConfig extends Thread {
 		/*
 		 * Get each IPS pack described in the XML descriptor.
 		 */
-		Vector<XMLElement> packs = data.getChildrenNamed("ips-pack");
+		Vector<IXMLElement> packs = data.getChildrenNamed("ips-pack");
 		/*
 		 * Add the resources we need. Those include the empty IPS image and the
 		 * pkg Java API.
@@ -1149,15 +1149,15 @@ public class CompilerConfig extends Thread {
 						+ e.getLocalizedMessage());
 			}
 		}
-		for (XMLElement pack: packs) {
+		for (IXMLElement pack: packs) {
 			/*
 			 * Build the package requirements. This means, we create a new clude
 			 * for each <include> or <exclude> element in the pack and add it to
 			 * the pack's clude list.
 			 */
 			List<Clude> cludes = new ArrayList<Clude>();
-			Vector<XMLElement> nodes = pack.getChildren();
-			for (XMLElement element: nodes) {
+			Vector<IXMLElement> nodes = pack.getChildren();
+			for (IXMLElement element: nodes) {
 				String tagname = element.getName();
 				String pattern = element.getAttribute("name");
 				if (tagname.equals("include")) cludes.add(new Clude(pattern,
