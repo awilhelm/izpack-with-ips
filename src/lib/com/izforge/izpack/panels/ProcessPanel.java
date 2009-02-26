@@ -26,7 +26,7 @@ import com.izforge.izpack.installer.InstallerFrame;
 import com.izforge.izpack.installer.IzPanel;
 import com.izforge.izpack.installer.ProcessPanelWorker;
 import com.izforge.izpack.util.AbstractUIProcessHandler;
-import net.n3.nanoxml.XMLElement;
+import com.izforge.izpack.adaptator.IXMLElement;
 
 import javax.swing.*;
 import java.awt.*;
@@ -158,7 +158,7 @@ public class ProcessPanel extends IzPanel implements AbstractUIProcessHandler
     /**
      * The compiler stops.
      */
-    public void finishProcessing()
+    public void finishProcessing(boolean unlockPrev, boolean unlockNext)
     {
         overallProgressBar.setIndeterminate(false);
         String no_of_jobs = Integer.toString(this.noOfJobs);
@@ -171,8 +171,11 @@ public class ProcessPanel extends IzPanel implements AbstractUIProcessHandler
         idata.installSuccess = worker.getResult();
         if (idata.panels.indexOf(this) != (idata.panels.size() - 1))
         {
-            parent.unlockNextButton();
+            if (unlockNext)
+                parent.unlockNextButton();
         }
+        if (unlockPrev)
+            parent.unlockPrevButton();
 
         // set to finished only in case of success
         finishedWork = idata.installSuccess;
@@ -244,7 +247,7 @@ public class ProcessPanel extends IzPanel implements AbstractUIProcessHandler
     /**
      * Create XML data for automated installation.
      */
-    public void makeXMLData(XMLElement panelRoot)
+    public void makeXMLData(IXMLElement panelRoot)
     {
         // does nothing (no state to save)
     }

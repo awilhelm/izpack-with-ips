@@ -31,8 +31,8 @@
         <url>http://izpack.org/</url>
         <javaversion>1.5</javaversion>
         <requiresjdk>no</requiresjdk>
-        <pack200/>
-        <run-privileged/>
+        <!--><pack200/>-->
+        <run-privileged condition="izpack.windowsinstall.vista|izpack.windowsinstall.7"/>
         <summarylogfilepath>$INSTALL_PATH/installinfo/Summary.htm</summarylogfilepath>
     </info>
 
@@ -105,7 +105,7 @@
     <!-- The panels in a classic order -->
     <panels>
         <panel classname="CheckedHelloPanel" id="hellopanel"/>
-        <panel classname="HTMLInfoPanel" id="infopanel"/>
+        <panel classname="HTMLInfoPanel" id="infopanel" encoding="ISO-8859-1"/>
         <panel classname="HTMLLicencePanel" id="licensepanel"/>
         <panel classname="TargetPanel" id="targetpanel"/>
         <panel classname="PacksPanel" id="packspanel"/>
@@ -159,12 +159,6 @@
                 <include name="doc/izpack/javadoc/**/*"/>
             </fileset>
         </pack>
-        <pack name="NanoXML Documentation" required="no">
-            <description>NanoXML documentation (for IzPack developers).</description>
-            <fileset dir="" targetdir="$INSTALL_PATH">
-                <include name="doc/nanoxml/**/*"/>
-            </fileset>
-        </pack>
 
         <!-- Utilities pack -->
         <pack name="Utilities" required="no">
@@ -172,7 +166,7 @@
             <fileset dir="" targetdir="$INSTALL_PATH">
                 <include name="utils/**/*"/>
             </fileset>
-            <executable targetfile="$INSTALL_PATH/utils/wrappers/izpack2app/Mac-App-Template/Contents/MacOS/JavaApplicationStub"
+            <executable targetfile="$INSTALL_PATH/utils/izpack2app/Mac-App-Template/Contents/MacOS/JavaApplicationStub"
                         stage="never"/>
         </pack>
 
@@ -197,6 +191,7 @@
 
     <!-- The native libraries to add -->
     <native type="izpack" name="ShellLink.dll"/>
+    <native type="izpack" name="ShellLink_x64.dll"/>
     <native type="3rdparty" name="COIOSHelper.dll" stage="both">
         <os family="windows"/>
     </native>

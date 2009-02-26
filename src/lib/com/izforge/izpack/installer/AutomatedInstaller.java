@@ -39,17 +39,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
-import net.n3.nanoxml.NonValidator;
-import net.n3.nanoxml.StdXMLParser;
-import net.n3.nanoxml.StdXMLReader;
-import net.n3.nanoxml.XMLBuilderFactory;
-import net.n3.nanoxml.XMLElement;
-
 import com.izforge.izpack.CustomData;
 import com.izforge.izpack.ExecutableFile;
 import com.izforge.izpack.LocaleDatabase;
 import com.izforge.izpack.Panel;
+import com.izforge.izpack.adaptator.*;
 import com.izforge.izpack.installer.DataValidator.Status;
+import com.izforge.izpack.adaptator.impl.XMLParser;
+import com.izforge.izpack.util.AbstractUIHandler;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.Housekeeper;
 import com.izforge.izpack.util.OsConstraint;
@@ -358,6 +355,7 @@ public class AutomatedInstaller extends InstallerBase
         if (!checkInstallerRequirements(this.idata))
         {
             Debug.log("not all installerconditions are fulfilled.");
+            System.exit(-1);
             return;
         }
 
@@ -375,6 +373,19 @@ public class AutomatedInstaller extends InstallerBase
             while (panelsIterator.hasNext())
             {
                 Panel p = (Panel) panelsIterator.next();
+                if (p.hasCondition()
+                        && !this.idata.getRules().isConditionTrue(p.getCondition(),
+                                this.idata.variables))
+                {
+                    Debug.log("Condition for panel " + p.getPanelid() + "is not fulfilled, skipping panel!");
+                    if (this.panelInstanceCount.containsKey(p.className))
+                    {
+                       // get number of panel instance to process
+                        this.panelInstanceCount.put(p.className, this.panelInstanceCount
+                                .get(p.className) + 1);
+                    }
+                    continue;
+                }
 
                 String praefix = "com.izforge.izpack.panels.";
                 if (p.className.compareTo(".") > -1)
@@ -404,8 +415,11 @@ public class AutomatedInstaller extends InstallerBase
                 {
                     // this is OK - not all panels have/need automation support.
                     Debug.log("ClassNotFoundException-skip :" + automationHelperClassName);
-                    // but validate anyway
+                    // but run actions and validate it anyway
+                    executePreConstructActions(p, null);
+                    executePreValidateActions(p, null);
                     validatePanel(p);
+                    executePostValidateActions(p, null);
                     continue;
                 }
 
@@ -415,6 +429,7 @@ public class AutomatedInstaller extends InstallerBase
                 {
                     try
                     {
+                        executePreConstructActions(p, null);
                         Debug.log("Instantiate :" + automationHelperClassName);
                         automationHelperInstance = automationHelperClass.newInstance();
                     }
@@ -422,14 +437,16 @@ public class AutomatedInstaller extends InstallerBase
                     {
                         Debug.log("ERROR: no default constructor for " + automationHelperClassName
                                 + ", skipping...");
-                        // but validate anyway
+                        // but run actions and validate it anyway
+                        executePreValidateActions(p, null);
                         validatePanel(p);
+                        executePostValidateActions(p, null);
                         continue;
                     }
                 }
 
                 // We get the panels root xml markup
-                Vector<XMLElement> panelRoots = this.idata.xmlData.getChildrenNamed(panelClassName);
+                Vector<IXMLElement> panelRoots = this.idata.xmlData.getChildrenNamed(panelClassName);
                 int panelRootNo = 0;
 
                 if (this.panelInstanceCount.containsKey(panelClassName))
@@ -438,7 +455,7 @@ public class AutomatedInstaller extends InstallerBase
                     panelRootNo = this.panelInstanceCount.get(panelClassName);
                 }
 
-                XMLElement panelRoot = panelRoots.elementAt(panelRootNo);
+                IXMLElement panelRoot = panelRoots.elementAt(panelRootNo);
 
                 this.panelInstanceCount.put(panelClassName, panelRootNo + 1);
 
@@ -448,6 +465,7 @@ public class AutomatedInstaller extends InstallerBase
                 {
                     try
                     {
+                        executePreActivateActions(p, null);
                         Debug.log("automationHelperInstance.runAutomated :"
                                 + automationHelperClassName + " entered.");
                         if (!automationHelperInstance.runAutomated(this.idata, panelRoot))
@@ -471,9 +489,9 @@ public class AutomatedInstaller extends InstallerBase
                     }
 
                 }
+                executePreValidateActions(p, null);
                 validatePanel(p);
-
-            }
+                executePostValidateActions(p, null);            }
 
             // this does nothing if the uninstaller was not included
             writeUninstallData();
@@ -537,17 +555,13 @@ public class AutomatedInstaller extends InstallerBase
      * @return The root of the XML file.
      * @throws Exception thrown if there are problems reading the file.
      */
-    public XMLElement getXMLData(File input) throws Exception
+    public IXMLElement getXMLData(File input) throws Exception
     {
         FileInputStream in = new FileInputStream(input);
 
         // Initialises the parser
-        StdXMLParser parser = new StdXMLParser();
-        parser.setBuilder(XMLBuilderFactory.createXMLBuilder());
-        parser.setReader(new StdXMLReader(in));
-        parser.setValidator(new NonValidator());
-
-        XMLElement rtn = (XMLElement) parser.parse();
+        IXMLParser parser = new XMLParser();
+        IXMLElement rtn = parser.parse(in);
         in.close();
 
         return rtn;
@@ -561,5 +575,71 @@ public class AutomatedInstaller extends InstallerBase
     public boolean getResult()
     {
         return this.result;
+    }
+    
+    private final List<PanelAction> createPanelActionsFromStringList(Panel panel, List<String> actions)
+    {
+        List<PanelAction> actionList = null;
+        if (actions != null)
+        {
+            actionList = new ArrayList<PanelAction>();
+            for (String actionClassName : actions){
+                PanelAction action = PanelActionFactory.createPanelAction(actionClassName);
+                action.initialize(panel.getPanelActionConfiguration(actionClassName));
+            }            
+        }
+        return actionList;
+    }
+
+    private final void executePreConstructActions(Panel panel, AbstractUIHandler handler)
+    {
+        List<PanelAction> preConstructActions = createPanelActionsFromStringList(panel, panel
+                .getPreConstructionActions());
+        if (preConstructActions != null)
+        {
+            for (int actionIndex = 0; actionIndex < preConstructActions.size(); actionIndex++)
+            {
+                preConstructActions.get(actionIndex).executeAction(idata, handler);
+            }
+        }
+    }
+
+    private final void executePreActivateActions(Panel panel, AbstractUIHandler handler)
+    {
+        List<PanelAction> preActivateActions = createPanelActionsFromStringList(panel, panel
+                .getPreActivationActions());
+        if (preActivateActions != null)
+        {
+            for (int actionIndex = 0; actionIndex < preActivateActions.size(); actionIndex++)
+            {
+                preActivateActions.get(actionIndex).executeAction(idata, handler);
+            }
+        }
+    }
+
+    private final void executePreValidateActions(Panel panel, AbstractUIHandler handler)
+    {
+        List<PanelAction> preValidateActions = createPanelActionsFromStringList(panel, panel
+                .getPreValidationActions());
+        if (preValidateActions != null)
+        {
+            for (int actionIndex = 0; actionIndex < preValidateActions.size(); actionIndex++)
+            {
+                preValidateActions.get(actionIndex).executeAction(idata, handler);
+            }
+        }
+    }
+
+    private final void executePostValidateActions(Panel panel, AbstractUIHandler handler)
+    {
+        List<PanelAction> postValidateActions = createPanelActionsFromStringList(panel,panel
+                .getPostValidationActions());
+        if (postValidateActions != null)
+        {
+            for (int actionIndex = 0; actionIndex < postValidateActions.size(); actionIndex++)
+            {
+                postValidateActions.get(actionIndex).executeAction(idata, handler);
+            }
+        }
     }
 }

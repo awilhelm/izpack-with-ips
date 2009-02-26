@@ -33,6 +33,8 @@ import com.izforge.izpack.Pack;
 import com.izforge.izpack.rules.RulesEngine;
 import com.sun.pkg.client.Fmri;
 import com.sun.pkg.client.Image.FmriState;
+import com.izforge.izpack.adaptator.IXMLElement;
+import com.izforge.izpack.adaptator.impl.XMLElementImpl;
 
 /**
  * Encloses information about the install process. This implementation is not
@@ -182,7 +184,7 @@ public class AutomatedInstallData {
 	/**
 	 * The xmlData for automated installers.
 	 */
-	public XMLElement xmlData;
+    public IXMLElement xmlData;
 
 	/**
 	 * Custom data.
@@ -223,7 +225,7 @@ public class AutomatedInstallData {
 		selectedPacks = new ArrayList<Pack>();
 		panels = new ArrayList<IzPanel>();
 		panelsOrder = new ArrayList();
-		xmlData = new XMLElement("AutomatedInstallation");
+        xmlData = new XMLElementImpl("AutomatedInstallation");
 		variables = new Properties();
 		attributes = new HashMap<String, Object>();
 		customData = new HashMap<String, List>();

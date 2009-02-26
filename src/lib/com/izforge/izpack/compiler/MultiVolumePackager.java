@@ -23,7 +23,7 @@ import com.izforge.izpack.XPackFile;
 import com.izforge.izpack.io.FileSpanningOutputStream;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.FileUtil;
-import net.n3.nanoxml.XMLElement;
+import com.izforge.izpack.adaptator.IXMLElement;
 
 import java.io.*;
 import java.net.URL;
@@ -49,7 +49,7 @@ public class MultiVolumePackager extends PackagerBase
     private ZipOutputStream primaryJarStream;
 
 
-    private XMLElement configdata = null;
+    private IXMLElement configdata = null;
 
     /**
      * The constructor.
@@ -421,7 +421,8 @@ public class MultiVolumePackager extends PackagerBase
             iter = packInfo.getParsables().iterator();
             while (iter.hasNext())
             {
-                objOut.writeObject(aPacksList);
+                
+                objOut.writeObject(iter.next());
             }
 
             // Write out information about executable files
@@ -429,7 +430,7 @@ public class MultiVolumePackager extends PackagerBase
             iter = packInfo.getExecutables().iterator();
             while (iter.hasNext())
             {
-                objOut.writeObject(aPacksList);
+                objOut.writeObject(iter.next());
             }
 
             // Write out information about updatecheck files
@@ -437,7 +438,7 @@ public class MultiVolumePackager extends PackagerBase
             iter = packInfo.getUpdateChecks().iterator();
             while (iter.hasNext())
             {
-                objOut.writeObject(aPacksList);
+                objOut.writeObject(iter.next());
             }
 
             // Cleanup
@@ -662,9 +663,9 @@ public class MultiVolumePackager extends PackagerBase
     }
 
     /* (non-Javadoc)
-     * @see com.izforge.izpack.compiler.IPackager#addConfigurationInformation(net.n3.nanoxml.XMLElement)
+     * @see com.izforge.izpack.compiler.IPackager#addConfigurationInformation(com.izforge.izpack.adaptator.IXMLElement)
      */
-    public void addConfigurationInformation(XMLElement data)
+    public void addConfigurationInformation(IXMLElement data)
     {
         this.configdata = data;
     }

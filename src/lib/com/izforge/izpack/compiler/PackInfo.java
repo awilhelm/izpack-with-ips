@@ -26,6 +26,7 @@ import com.izforge.izpack.util.OsConstraint;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -34,8 +35,13 @@ import java.util.*;
  *
  * @author Chadwick McHenry
  */
-public class PackInfo
+public class PackInfo implements Serializable
 {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3604642858885697783L;
 
     /**
      * The pack object serialized in the installer.
@@ -196,6 +202,17 @@ public class PackInfo
     {
         return pack;
     }
+    
+    public boolean isHidden()
+    {
+        return pack.isHidden();
+    }
+
+    
+    public void setHidden(boolean hidden)
+    {
+        pack.setHidden(hidden);
+    }
 
     /***********************************************************************************************
      * Public methods to add data to the Installer being packed
@@ -238,6 +255,7 @@ public class PackInfo
         }
 
         PackFile packFile = new PackFile(baseDir, file, targetfile, osList, override, additionals);
+        packFile.setLoosePackInfo(pack.loose);
         packFile.setCondition(condition);
         files.put(packFile, file);
     }
@@ -364,4 +382,8 @@ public class PackInfo
         this.pack.setCondition(condition);
     }
 
+    public void addValidator(String validatorClassName)
+    {
+        pack.addValidator(validatorClassName);
+    }
 }

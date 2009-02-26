@@ -140,6 +140,8 @@ There are some graphic elements and behavior which are preferred by some people 
 
 * 'useLabelIcons': possible are "yes" or "no". Default is "yes". If it is set to "no", all labels which are created via the LabelFactory contains no icon also a icon id was submitted. Directly created labels are not affected.
 
+* 'labelFontSize': A float value used as a multiplier for the font size on labels created via the LabelFactory and IzPanel. Directly created labels are not affected.
+
 * 'layoutAnchor':layout anchor for IzPanels. Valid are "NORTH", "NORTHWEST", "SOUTHWEST", "SOUTH" and "CENTER". Only panels which are using the layout helper of IzPanels are supported. These are not all standard panels. At developing custom panels it is recommended to use the layout helper with an IzPanelLayout. Note: The anchor definition will be used for all panels!
   
 * Gaps: there are defined different gaps between different components of a IzPanel if using IzPanelLayout. The gaps can be set also via the element '<modifier>' of '<guiprefs>'. It is possible to declare different values for X and Y axis. This will be determined in the key word name. X Gaps are insert after Y gaps under the control for which the gap was declared. Following key words are defined:
@@ -383,5 +385,33 @@ then the related entries of the langpacks will look like this: ::
 
   <str id="core.package" txt="Core Package"/>
   <str id="core.package.description" txt="The core package provides
+
+Validators for Packs
+---------------------
+
+It's possible to create custom java validators (as you may know from `Panels`__). To do that, add the validator element to your packs definition like this:
+
+__ installation-files.html#validator-optional-validation-on-idata
+
+::
+
+  <pack name="foo" id="foo.package" ...>
+    <validator>my.Validatorclass</validator>
+  </pack>
+
+Now you have to create and include a class implementing the 'PackValidator' interface: ::
+
+  package my;
+  import com.izforge.izpack.installer.InstallData;
+  import com.izforge.izpack.installer.PackValidator;
+  import com.izforge.izpack.util.AbstractUIHandler;
+  public class Validatorclass implements PackValidator {
+    public boolean validate(AbstractUIHandler handler,
+        InstallData idata, String packsId, boolean isSelected) {
+      [ your validation code here ]
+      return false; // returns to the pack selection without further notice
+      return true; // passes on to the next defined validator for this pack
+    }
+  }
 
 .. include:: include-bottom.inc

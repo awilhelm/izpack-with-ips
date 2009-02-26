@@ -23,16 +23,18 @@ package com.izforge.izpack.compiler;
 import com.izforge.izpack.Pack;
 import com.izforge.izpack.PackFile;
 import com.izforge.izpack.IPSPack;
+import com.izforge.izpack.adaptator.IXMLElement;
+import com.izforge.izpack.adaptator.IXMLWriter;
+import com.izforge.izpack.adaptator.impl.XMLElementImpl;
+import com.izforge.izpack.adaptator.impl.XMLWriter;
 import com.izforge.izpack.util.FileUtil;
-import net.n3.nanoxml.XMLElement;
-import net.n3.nanoxml.XMLWriter;
 
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Pack200;
-import java.util.jar.JarEntry;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -228,8 +230,7 @@ public class Packager extends PackagerBase
 
         int packNumber = 0;
         Iterator<PackInfo> packIter = packsList.iterator();
-
-        XMLElement root = new XMLElement("packs");
+        IXMLElement root = new XMLElementImpl("packs");
 
         while (packIter.hasNext())
         {
@@ -382,7 +383,7 @@ public class Packager extends PackagerBase
                 packStream.closeAlways();
             }
 
-            XMLElement child = new XMLElement("pack");
+            IXMLElement child = new XMLElementImpl("pack",root);
             child.setAttribute("nbytes", Long.toString(pack.nbytes));
             child.setAttribute("name", pack.name);
             if (pack.id != null)
@@ -392,15 +393,6 @@ public class Packager extends PackagerBase
             root.addChild(child);
 
             packNumber++;
-        }
-
-        // Write packsinfo for web installers
-        if (packJarsSeparate)
-        {
-            FileWriter writer = new FileWriter(baseFile.getParent()
-                    + File.separator + "packsinfo.xml");
-            XMLWriter xmlwriter = new XMLWriter(writer);
-            xmlwriter.write(root);
         }
 
         // Now that we know sizes, write pack metadata to primary jar.
@@ -569,9 +561,9 @@ public class Packager extends PackagerBase
     }
 
     /* (non-Javadoc)
-    * @see com.izforge.izpack.compiler.IPackager#addConfigurationInformation(net.n3.nanoxml.XMLElement)
+    * @see com.izforge.izpack.compiler.IPackager#addConfigurationInformation(com.izforge.izpack.adaptator.IXMLElement)
     */
-    public void addConfigurationInformation(XMLElement data)
+    public void addConfigurationInformation(IXMLElement data)
     {
         // TODO Auto-generated method stub
 

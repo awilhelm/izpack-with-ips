@@ -298,13 +298,18 @@
 			<include name="com/izforge/izpack/util/Debug.java" />
 			<include name="com/izforge/izpack/util/OsConstraint.java" />
 			<include name="com/izforge/izpack/util/JarOutputStream.java" />
-			<include name="com/izforge/izpack/rules/*.java" />
-			<include name="net/n3/nanoxml/*.java" />
+     		  	<include name="com/izforge/izpack/rules/*.java" />
+            <!--<include name="net/n3/nanoxml/*.java"/>-->
 			<include name="com/sun/pkg/client/*.java" />
+            <include name="com/izforge/izpack/adaptator/**/*.java"/>
+            <include name="com/izforge/izpack/adaptator/*.java"/>
 		</javac>
 		<copy todir="${build.dir}/com/izforge/izpack/ant/langpacks">
 			<fileset dir="${src.dir}/com/izforge/izpack/ant/langpacks" />
 		</copy>
+        <copy todir="${build.dir}/com/izforge/izpack/adaptator">
+            <fileset dir="${src.dir}/com/izforge/izpack/adaptator"/>
+        </copy>
 	</target>
 
 	<!-- Package compiler.jar -->
@@ -329,12 +334,14 @@
 				<include name="com/izforge/izpack/util/FileUtil.class" />
 				<include name="com/izforge/izpack/ant/*.class" />
 				<include name="com/izforge/izpack/ant/langpacks/*.properties" />
+                <include name="com/izforge/izpack/adaptator/*.xsl"/>
 				<include name="com/izforge/izpack/event/CompilerListener.class" />
 				<include name="com/izforge/izpack/event/SimpleCompilerListener.class" />
 				<include name="com/izforge/izpack/rules/*.class" />
 				<include name="com/izforge/izpack/installer/*.class" />
-				<include name="net/n3/nanoxml/*.class" />
+                <include name="com/izforge/izpack/adaptator/**/*.class"/>
 				<include name="com/sun/pkg/client/*.class" />
+                <include name="com/izforge/izpack/adaptator/*.class"/>
 			</fileset>
 		</jar>
 	</target>
@@ -354,8 +361,11 @@
 				<exclude name="com/izforge/izpack/*.class" />
 				<exclude name="com/izforge/izpack/installer/*.class" />
 				<exclude name="com/izforge/izpack/util/*.class" />
-				<exclude name="net/n3/nanoxml/*.class" />
+                <!--<exclude name="net/n3/nanoxml/*.class"/>-->
+            		<exclude name="com/izforge/izpack/adaptator/**/*.class"/>
+            		<exclude name="com/izforge/izpack/adaptator/*.class"/>
 			</zipfileset>
+            <zipfileset src="${izevent.jar}"/>
 			<zipfileset src="lib/ant.jar" />
 			<fileset dir="${basedir}">
 				<include name="bin/langpacks/flags/*" />
@@ -404,12 +414,14 @@
 			<include name="com/izforge/izpack/uninstaller/SelfModifier*.java" />
 			<include name="com/izforge/izpack/rules/*.java" />
 			<include name="com/izforge/izpack/compiler/DynamicVariable.java" />
-			<include name="net/n3/nanoxml/*.java" />
+            <!--<include name="net/n3/nanoxml/*.java"/>-->
 			<include name="com/izforge/izpack/panels/HelpWindow.java" />
+            <include name="com/izforge/izpack/adaptator/**/*.java"/>
+            <include name="com/izforge/izpack/adaptator/*.java"/>
 		</javac>
 	</target>
 	<!-- Package installer.jar -->
-	<target name="build.installer" depends="compile.installer">
+    <target name="build.installer" depends="compile.installer, build.listener-base">
 		<jar jarfile="${installer.jar}">
 			<manifest>
 				<attribute name="Built-By" value="IzPack" />
@@ -431,6 +443,9 @@
 				<include name="com/izforge/izpack/compiler/DynamicVariable.class" />
 				<include name="com/izforge/izpack/compiler/CompilerException.class" />
 				<include name="com/izforge/izpack/panels/Validator*.class" />
+                <!--<include name="net/n3/nanoxml/*.class"/>-->
+            	<include name="com/izforge/izpack/adaptator/**/*.class"/>
+            	<include name="com/izforge/izpack/adaptator/*.class"/>
 				<include name="com/izforge/izpack/panels/HelpWindow.class" />
 				<include name="net/n3/nanoxml/*.class" />
 				<include name="com/sun/pkg/client/*.class" />
@@ -444,8 +459,10 @@
 				<include name="com/izforge/izpack/installer/run-with-privileges-on-osx" />
 				<include name="com/izforge/izpack/installer/elevate.js" />
 				<include name="com/izforge/izpack/util/**/*.sh" />
+            	<include name="com/izforge/izpack/adaptator/styleSheet.xsl"/>
 			</fileset>
 			<fileset dir="${img.dir}/installer" />
+            <zipfileset src="${izevent.jar}"/>
 		</jar>
 	</target>
 
@@ -468,7 +485,9 @@
 
 			<include name="com/izforge/izpack/uninstaller/*.java" />
 			<exclude name="com/izforge/izpack/gui/IzPackKMetalTheme.java" />
-			<include name="net/n3/nanoxml/*.java" />
+            <!--<include name="net/n3/nanoxml/*.java"/>-->
+            <include name="com/izforge/izpack/adaptator/**/*.java"/>
+            <include name="com/izforge/izpack/adaptator/*.java"/>
 		</javac>
 	</target>
 
@@ -486,7 +505,9 @@
 				<include name="com/izforge/izpack/uninstaller/*.class" />
 				<include name="com/izforge/izpack/ExecutableFile.class" />
 				<exclude name="com/izforge/izpack/gui/IzPackKMetalTheme.class" />
-				<include name="net/n3/nanoxml/*.class" />
+                <!--<include name="net/n3/nanoxml/*.class"/>-->
+            	<include name="com/izforge/izpack/adaptator/**/*.class"/>
+            	<include name="com/izforge/izpack/adaptator/*.class"/>
 				<include name="com/izforge/izpack/installer/PrivilegedRunner.class" />
 			</fileset>
 			<fileset dir="${src.dir}">
@@ -518,7 +539,9 @@
 			<include name="com/izforge/izpack/util/xml/*.java" />
 
 			<exclude name="com/izforge/izpack/gui/IzPackKMetalTheme.java" />
-			<include name="net/n3/nanoxml/*.java" />
+            <!--<include name="net/n3/nanoxml/*.java"/>-->
+            <include name="com/izforge/izpack/adaptator/**/*.java"/>
+            <include name="com/izforge/izpack/adaptator/*.java"/>
 		</javac>
 	</target>
 	<!-- Package extended uninstaller.jar used if one ore more native libs are
@@ -690,10 +713,13 @@
 		<build-panel name="UserInputPanel">
 			<include name="com/izforge/izpack/panels/PasswordGroup.java" />
 			<include name="com/izforge/izpack/panels/ProcessingClient.java" />
+        	<include name="com/izforge/izpack/panels/StringInputProcessingClient.java"/>
 			<include name="com/izforge/izpack/panels/Processor.java" />
 			<include name="com/izforge/izpack/panels/RuleInputField.java" />
 			<include name="com/izforge/izpack/panels/RuleTextField.java" />
 			<include name="com/izforge/izpack/panels/TextInputField.java" />
+        	<include name="com/izforge/izpack/panels/FileInputField.java"/>
+        	<include name="com/izforge/izpack/panels/MultipleFileInputField.java"/>
 			<include name="com/izforge/izpack/panels/UserInputPanel.java" />
 			<include name="com/izforge/izpack/panels/UserInputPanelAutomationHelper.java" />
 			<include name="com/izforge/izpack/panels/Validator.java" />
@@ -709,9 +735,12 @@
 			<include name="com/izforge/izpack/panels/ConditionalUserInputPanel.java" />
 			<include name="com/izforge/izpack/panels/PasswordGroup.java" />
 			<include name="com/izforge/izpack/panels/ProcessingClient.java" />
+        	<include name="com/izforge/izpack/panels/StringInputProcessingClient.java"/>
 			<include name="com/izforge/izpack/panels/Processor.java" />
 			<include name="com/izforge/izpack/panels/RuleInputField.java" />
 			<include name="com/izforge/izpack/panels/RuleTextField.java" />
+        	<include name="com/izforge/izpack/panels/FileInputField.java"/>
+        	<include name="com/izforge/izpack/panels/MultipleFileInputField.java"/>
 			<include name="com/izforge/izpack/panels/TextInputField.java" />
 			<include name="com/izforge/izpack/panels/UserInputPanel.java" />
 			<include name="com/izforge/izpack/panels/UserInputPanelAutomationHelper.java" />
@@ -741,6 +770,7 @@
 		</build-panel>
 		<build-panel name="TreePacksPanel">
 			<include name="com/izforge/izpack/panels/TreePacksPanel.java" />
+            <include name="com/izforge/izpack/panels/TreePacksPanelAutomationHelper.java"/>
 			<include name="com/izforge/izpack/panels/ImgPacksPanelAutomationHelper.java" />
 			<include name="com/izforge/izpack/panels/ImgPacksPanelBase.java" />
 			<include name="com/izforge/izpack/panels/PacksModel.java" />
@@ -751,6 +781,10 @@
 		<build-panel name="InstallationTypePanel">
 			<include name="com/izforge/izpack/panels/InstallationTypePanel.java" />
 		</build-panel>
+        <build-panel name="HTMLHelloPanel">
+            <include name="com/izforge/izpack/panels/HTMLHelloPanel.java"/>
+            <include name="com/izforge/izpack/panels/HTMLInfoPanel.java"/>
+        </build-panel>
 	</target>
 
 	<!--
@@ -872,12 +906,14 @@
 	<macrodef name="build-uninstaller-listener">
 		<attribute name="name" />
 		<attribute name="srcdir" default="${src.dir}" />
+        <attribute name="classpath-ext" description="An extension of the classpath required to build the listener"
+                   default=""/>
 		<element name="uninstaller-fileset"
 		         implicit="yes"
 		         description="include and exclude elements indicating listener sources" />
 		<sequential>
-			<build-listener name="@{name}"
-			                srcdir="@{srcdir}"
+            <build-listener name="@{name}" srcdir="@{srcdir}" izeventExcludes="**/*Installer*"
+                            classpath-ext="@{classpath-ext}">
 			                izeventExcludes="**/*Installer*">
 				<uninstaller-fileset />
 			</build-listener>
@@ -935,6 +971,16 @@
 			<include name="com/coi/tools/os/izpack/Registry.java" />
 			<include name="com/coi/tools/os/izpack/COIOSHelper.java" />
 		</build-uninstaller-listener>
+
+        <build-installer-listener name="BSFInstallerListener" classpath-ext="$${basedir}/lib/bsf.jar">
+            <include name="com/izforge/izpack/event/BSFInstallerListener.java" />
+            <include name="com/izforge/izpack/event/BSFAction.java" />
+        </build-installer-listener>
+
+        <build-uninstaller-listener name="BSFUninstallerListener" classpath-ext="$${basedir}/lib/bsf.jar">
+            <include name="com/izforge/izpack/event/BSFUninstallerListener.java" />
+            <include name="com/izforge/izpack/event/BSFAction.java" />
+        </build-uninstaller-listener>
 
 		<!-- CUSTOM ACTION test START
         <build-compiler-listener name="ChmodCompilerListener">
@@ -1059,6 +1105,11 @@
 		-->
 		<copy todir="${basedir}/bin/native/izpack"
 		      file="${basedir}/src/native/ShellLink/Release_Unicode/ShellLink.dll"
+              verbose="true"
+              overwrite="yes"
+              preservelastmodified="true"/>
+        <copy todir="${basedir}/bin/native/izpack"
+              file="${basedir}/src/native/ShellLink_x64/Release_Unicode/ShellLink_x64.dll"
 		      verbose="true"
 		      overwrite="yes"
 		      preservelastmodified="true" />

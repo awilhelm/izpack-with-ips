@@ -21,9 +21,14 @@
 package com.izforge.izpack;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.izforge.izpack.adaptator.IXMLElement;
+import com.izforge.izpack.installer.PanelActionConfiguration;
+import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.OsConstraint;
 
 /**
@@ -59,6 +64,29 @@ public class Panel implements Serializable
      * The validator for this panel
      */
     private String validator = null;
+    
+    /**
+     * list of all pre panel construction actions
+     */
+    private List<String> preConstructionActions = null;
+
+    /**
+     * list of all pre panel activation actions
+     */
+    private List<String> preActivationActions = null;
+
+    /**
+     * list of all pre panel validation actions
+     */
+    private List<String> preValidationActions = null;
+
+    /**
+     * list of all post panel validation actions
+     */
+    private List<String> postValidationActions = null;
+    
+    private HashMap<String,PanelActionConfiguration> actionConfiguration = null;
+
 
     /**
      * A HashMap for URLs to Helpfiles, key should be iso3-code
@@ -142,5 +170,76 @@ public class Panel implements Serializable
     public HashMap<String, String> getHelpsMap()
     {
         return this.helps;
+    }
+    
+    public List<String> getPreConstructionActions()
+    {
+        return preConstructionActions;
+    }
+
+    public void addPreConstructionActions(String preConstructionAction)
+    {
+        if (this.preConstructionActions == null)
+        {
+            this.preConstructionActions = new ArrayList<String>();
+        }
+        this.preConstructionActions.add(preConstructionAction);
+    }
+
+    public List<String> getPreActivationActions()
+    {
+        return preActivationActions;
+    }
+
+    public void addPreActivationAction(String preActivationAction)
+    {
+        if (this.preActivationActions == null)
+        {
+            this.preActivationActions = new ArrayList<String>();
+        }
+        this.preActivationActions.add(preActivationAction);
+    }
+
+    public List<String> getPreValidationActions()
+    {
+        return preValidationActions;
+    }
+
+    public void addPreValidationAction(String preValidationAction)
+    {
+        if (this.preValidationActions == null)
+        {
+            this.preValidationActions = new ArrayList<String>();
+        }
+        this.preValidationActions.add(preValidationAction);
+    }
+
+    public List<String> getPostValidationActions()
+    {
+        return postValidationActions;
+    }
+
+    public void addPostValidationAction(String postValidationAction)
+    {
+        if (this.postValidationActions == null)
+        {
+            this.postValidationActions = new ArrayList<String>();
+        }
+        this.postValidationActions.add(postValidationAction);
+     }
+    
+    public void putPanelActionConfiguration(String panelActionClassName, PanelActionConfiguration configuration){
+        if (this.actionConfiguration == null){
+            this.actionConfiguration = new HashMap<String, PanelActionConfiguration>();
+        }                
+        this.actionConfiguration.put(panelActionClassName, configuration);
+    }
+    
+    public PanelActionConfiguration getPanelActionConfiguration(String panelActionClassName){
+        PanelActionConfiguration result = null;
+        if (this.actionConfiguration != null){
+            result = this.actionConfiguration.get(panelActionClassName);
+        }
+        return result;
     }
 }

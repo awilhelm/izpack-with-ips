@@ -79,6 +79,10 @@ public class Info implements Serializable
      */
     private String uninstallerName = "uninstaller.jar";
     /**
+     * The uninstaller path
+     */
+    private String uninstallerPath = "$INSTALL_PATH/Uninstaller";
+    /**
      * condition for writing the uninstaller
      */
     private String uninstallerCondition = null;
@@ -102,6 +106,8 @@ public class Info implements Serializable
 
     private boolean requirePrivilegedExecution = false;
 
+    private String privilegedExecutionConditionID = null;
+
     public boolean isPrivilegedExecutionRequired()
     {
         return requirePrivilegedExecution;
@@ -110,6 +116,16 @@ public class Info implements Serializable
     public void setRequirePrivilegedExecution(boolean requirePrivilegedExecution)
     {
         this.requirePrivilegedExecution = requirePrivilegedExecution;
+    }
+
+    public String getPrivilegedExecutionConditionID()
+    {
+        return privilegedExecutionConditionID;
+    }
+
+    public void setPrivilegedExecutionConditionID(String privilegedExecutionConditionID)
+    {
+        this.privilegedExecutionConditionID = privilegedExecutionConditionID;
     }
 
     /**
@@ -280,6 +296,24 @@ public class Info implements Serializable
         return this.uninstallerName;
     }
 
+    /**
+     * Sets the path to the uninstaller
+     * 
+     * @param path the path to the uninstaller
+     */
+    public void setUninstallerPath(String path) {
+      this.uninstallerPath = path;
+    }
+
+    /**
+     * Returns the path to the uninstaller
+     * 
+     * @return the path to the uninstaller
+     */
+    public String getUninstallerPath() {
+      return this.uninstallerPath;
+    }
+    
     public boolean isJdkRequired()
     {
         return jdkRequired;

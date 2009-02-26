@@ -39,6 +39,8 @@ public class Pack implements Serializable
 
     static final long serialVersionUID = -5458360562175088671L;
 
+    private boolean hidden;
+    
     /**
      * Flag for store files of this pack outside the installation jar file
      */
@@ -137,6 +139,8 @@ public class Pack implements Serializable
      * The id to use if we want to obtain this pack's image resource
      */
     public String packImgId;
+
+    private List<String> validators = new ArrayList<String>();
 
     /**
      * white colour
@@ -316,5 +320,27 @@ public class Pack implements Serializable
     public boolean hasCondition()
     {
         return this.condition != null;
+    }
+    
+    public void addValidator(String validatorClassName)
+    {
+        validators.add(validatorClassName);
+    }
+    
+    public List<String> getValidators()
+    {
+        return validators;
+    }
+
+    
+    public boolean isHidden()
+    {
+        return hidden;
+    }
+
+    
+    public void setHidden(boolean hidden)
+    {
+        this.hidden = hidden;
     }
 }

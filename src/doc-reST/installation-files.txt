@@ -130,8 +130,8 @@ The following variables are built-in :
 -   ``$JAVA_HOME`` : the JavaTM virtual machine home path
 -   ``$CLASS_PATH`` : the Class Path used mainly for Java Applications
 -   ``$USER_HOME`` : the user's home directory path
--   ``$USER_name`` : the user name
--   ``$APP_name`` : the application name
+-   ``$USER_NAME`` : the user name
+-   ``$APP_NAME`` : the application name
 -   ``$APP_URL`` : the application URL
 -   ``$APP_VER`` : the application version
 -   ``$ISO3_LANG`` : the ISO3 language code of the selected langpack.
@@ -168,9 +168,30 @@ the ``<dynamicvariables>`` element. The value of dynamic variables will be evalu
 is switched, i.e. between the panels. Dynamic variables can have a condition which will be evaluated
 first. If it's true, the value would be assigned, otherwise nothing happens to the variable.
 
-Example: To change a certain directory based on user input, use the following
+As and addition to normal variables, the value of a variable can either be defined by using the value
+attribute or by using a child element called value.
+
+Example1: To change a certain directory based on user input, use the following
 ``<variable name="test" value="/test/${USER_INPUT}" condition="hasuserinput" />`` 
 The condition has userinput has to be specified in the condition section of installation XML.
+
+Example2: To comment out something in a xml file if a certain pack with id mycoolfeature is not activated, 
+you could use "two" dynamic variables to create a xml comment or not.
+
+::
+
+	<variable name="XML_Comment_Start" condition="!izpack.selected.mycoolfeature">
+		<value><![CDATA[<!--]]></value>
+	</variable>
+	<variable name="XML_Comment_End" condition="!izpack.selected.mycoolfeature">
+		<value><![CDATA[-->]]></value>
+	</variable>
+	<variable name="XML_Comment_Start" value="" condition="izpack.selected.mycoolfeature" />
+	<variable name="XML_Comment_End" value="" condition="izpack.selected.mycoolfeature" />
+
+The condition izpack.selected.mycoolfeature is generated automatically when a pack with id mycoolfeature 
+was specified. You would now use ``${XML_Comment_Start}`` and ``${XML_Comment_End}`` in a file which 
+should be parsed.
 
 Parse Types
 -----------
@@ -258,6 +279,8 @@ It contains the following elements :
     change the default name of the generated uninstaller, *i.e.* ``
     uninstaller.jar``. The ``condition`` attribute can be used to specify a
     condition which has to be fullfilled for creating the uninstaller. 
+    The ``path`` attribute can be used to define the destination path where the uninstaller 
+    is written to, *i.e.* ``${INSTALL_PATH}/Uninstaller``.
 -   ``<javaversion>`` : specifies the minimum version of Java required to
     install your program. Values can be ``1.2``, ``1.2.2``, ``1.4``, etc. The
     test is a lexical comparison against the ``java.version`` System property
@@ -280,7 +303,9 @@ It contains the following elements :
     decompression a JAR won't be identical to its original version (yet the code in the class files remains
     semantically equivalent).
 -   ``<run-privileged/>``: adding this element will make the installer attempt to launch itself with administrator
-    permissions. This is not supported on all platforms, in which case a message will be provided to the user before
+    permissions. Il also supports a ``condition`` attribute to reference a condition id so that the elevation
+    is not always attempted (e.g., you may want to activate it only for Windows Vista).
+    This is not supported on all platforms, in which case a message will be provided to the user before
     continuing the installation. Only use this feature if you really need to be an administrator as part of your
     installation process...
 
@@ -300,6 +325,24 @@ Here is an example of a typical ``<info>`` section :
       <javaversion>1.2</javaversion>
     </info>
 
+
+Here is one where the privileges elevation is attempted on Windows Vista and Mac OS X :
+
+::
+
+    <info>
+        <appname>IzPack</appname>
+        <appversion>4.2.0</appversion>
+        <authors>
+            <author email="" name="Julien Ponge (project founder)"/>
+            <author email="" name="The fantastic IzPack developers and contributors"/>
+        </authors>
+        <url>http://izpack.org/</url>
+        <javaversion>1.5</javaversion>
+        <requiresjdk>no</requiresjdk>
+        <run-privileged condition="izpack.windowsinstall.vista|izpack.macinstall"/>
+        <summarylogfilepath>$INSTALL_PATH/installinfo/Summary.htm</summarylogfilepath>
+    </info>
 
 
 The Packaging Element ``<packaging>``
@@ -482,6 +525,27 @@ expression language. The language has the following operators:
 Neverthless if you define really complex conditions it's much easier to define them using the xml structure. 
 
 More types of conditions can be defined by inheriting com.izforge.izpack.Condition class.
+
+Built-in conditions
+''''''''''''''''''''
+
+A number of built-in condition IDs are available for you.
+
+=============================== ===================================
+Name                            Condition
+=============================== ===================================
+izpack.windowsinstall           The OS is Windows
+izpack.windowsinstall.xp        The OS is Windows XP
+izpack.windowsinstall.2003      The OS is Windows Server 2003
+izpack.windowsinstall.vista     The OS is Windows Vista
+izpack.windowsinstall.7         The OS is Windows 7
+izpack.macinstall               The OS is Mac OS X
+izpack.linuxinstall             The OS is a Linux variant
+izpack.solarisinstall           The OS is a Solaris variant
+izpack.solarisinstall.x86       The OS is a Solaris,x86 variant
+izpack.solarisinstall.sparc     The OS is a Solaris sparc variant
+=============================== ===================================
+
 
 The Installer Requirements Element ``<installerrequirements>``
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -766,6 +830,34 @@ Here's a sample :
     <panel classname="UserInputPanel" id="jdbc.connection.parameters">
       <validator classname="JdbcConnectionValidator" />
     </panel>
+    
+``<actions>`` - optional actions for the panel
+'''''''''''''''''''''''''''''''''''''''''''''''
+
+Here you can define multiple actions that are done during the lifetime of the panel. 
+The class must implement the interface com.izforge.izpack.installer.PanelAction.
+The actions are also called during an automated installation.
+
+The ``<actions>`` tag has no attributes but has ``<action>`` markups with the following attributes :
+
+-   ``stage``: The stage when the action should be triggered.
+		Possible values are ``preconstruct``, ``preactivate``, ``prevalidate`` or ``postvalidate``.
+-   ``classname``: The class implementing com.izforge.izpack.installer.PanelAction
+
+
+Here's a sample :
+
+::
+
+    <panel classname="UserInputPanel" id="jdbc.connection.parameters">
+      <actions>
+        <action stage="preconstruct" classname="ConnectionPreConstructAction" />
+        <action stage="preactivate" classname="ConnectionPreActivateAction" />
+        <action stage="prevalidate" classname="ConnectionPreVAlidateAction" />
+        <action stage="postvalidate" classname="ConnectionPostValidateAction" />
+      </actions> 
+    </panel>
+
 
 The Packs Element ``<packs>``
 '''''''''''''''''''''''''''''''
@@ -801,6 +893,12 @@ The ``<pack>`` takes the following attributes :
     using the same value for the ``id`` attribute of the ``<res>`` element.
 -	``condition``: an id of a condition which has to be fullfilled to install this 
 	package. 
+-   ``hidden``: takes ``true`` or ``false`` and specifies whether the pack 
+    shall be shown in the packs panel. The bytes of such a hidden pack will be
+    used to calculate the required space, but the pack itself won't be shown. A
+    hidden pack can be selected conditionally. So you have to specify a condition to
+    enable it for installation.
+    The default for this attribute is ``false``
 
 The ``<refpack>`` takes only one attribute ``file``, which contains the
 relative path (from the installation compiler) to an externally defined
@@ -1207,45 +1305,49 @@ A sample :
 XInclude-style constructs
 -------------------------
 
-The xinclude element is used to include xml or text documents in your configuration files.
+The xi:include element is used to include xml or text documents in your configuration files.
 
-The xinclude element can be used anywhere in pretty much any of the xml files used by IzPack. It is based on the XInclude recomendation produced by the W3C (http://www.w3.org/TR/xinclude/) and should be able to be used as decribed in that document. Note that as namespaces are not supported in IzPack the elements specified by the w3c have been prefixed with 'x' so 'xsi:include' becomes 'xinclude' and 'xsi:fallback' becomes 'xfallback'.
+The xi:include element can be used anywhere in pretty much any of the xml files used by IzPack. It is supported by the javax DocumentBuilder. It follows the XInclude recommandation produced by the W3C (http://www.w3.org/TR/xinclude/) and should be able to be used as decribed in that document. 
 
-The xinclude element has the following attributes:
+To use the xi:include, you have to specify the namespace xmlns:xi="http://www.w3.org/2001/XInclude" in your xml.
+
+If a logical error appear in an included file, the line number shown will indicate the xinclude element in the main xml file.
+
+The xi:include element has the following attributes:
 
 href
-  The location of the file to include. If this is a relative path (e.g. href='../bob.xml') then the file is resolved relative to the document that includes the xinclude element. The href element can be a remote url (e.g. href='http://example.com/file.txt') but this is not recommended. The href attribute can also be ommitted however as xpointers are not currently supported this has no meaning.
+  The location of the file to include. If this is a relative path (e.g. href='../bob.xml') then the file is resolved relative to the path of execution. The href element can be a remote url (e.g. href='http://example.com/file.txt') but this is not recommended.
 
 parse
-  Indicates that the included file should be treated as xml, forcing the included file to be parsed (which results in all xinclude elements in the included file to also be included), or as text which includes the specified file as a text node. It can have a value of 'xml' or 'text' and defaults to 'xml' if ommitted
+  Indicates that the included file should be treated as xml, forcing the included file to be parsed (which results in all xinclude elements in the included file to also be included), or as text which includes the specified file as a text node. It can have a value of 'xml' or 'text' and defaults to 'xml' if ommitted.
 
 xpointer
-  This element is not supported
+  In case in parse="xml", you can use xpointer to get a part of the included xml. The details of the xpointer framework can be found http://www.w3.org/TR/2003/REC-xptr-framework-20030325/.
 
 encoding
-  This is used when the parse attribute is 'text' to specify the character encoding of the included text document. It has no effect if parse is 'xml'
+  This is used when the parse attribute is 'text' to specify the character encoding of the included text document. It has no effect if parse is 'xml'.
 
 accept
   Used if the href attribute specifies a url accessible via HTTP. The value of this attribute will be added as the accpet header on the HTTP request.
 
 
-The xfallback element
+The fallback element
 ''''''''''''''''''''''
 
-The xfallback element is used to provide a fallback if the xinclude element fails. It can be empty or can contain a CDATA section containing valid xml (no document fragments allowed). If it is empty then a failure to include the specified document is supressed. If it contains a CDATA section then a failure to include the specified document causes the xml specified in the CDATA is parsed (evaluating nested xinclude elements) and inserted into the document in its place.
+The xi:fallback element is used to provide a fallback if the xi:include element fails. It can be empty or can contain a valid xml. If it is empty then a failure to include the specified document is supressed. If it contains a xml then a failure to include the specified document causes the xml specified in the fallback is parsed (evaluating nested xinclude elements) and inserted into the document in its place.
 
 
-For example the following use of xinclude
+For example the following use of xi:include
 
 ::
 
   <?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
   <installation version="1.0" xmlns:xi="http://www.izforge.com/izpack/include">
-      <xinclude href="does-not-exist.xml">
-          <xfallback>
-              <![CDATA[<bbb>hello</bbb>]]>
-          </xfallback>
-      </xinclude>
+      <xi:include href="does-not-exist.xml">
+          <xi:fallback>
+              <bbb>hello</bbb>
+          </xi:fallback>
+      </xi:include>
   </installation>
 
 will result in 
@@ -1253,7 +1355,7 @@ will result in
 ::
   
   <installation version="1.0" xmlns:xi="http://www.izforge.com/izpack/include">
-      <bbb>hello</bbb>]]>
+      <bbb>hello</bbb>
   </installation>
 
 if the file 'does-not-exist.xml' does indeed not exist.
@@ -1264,7 +1366,7 @@ The xfragment element
 
 The xfragment element allows document fragments (xml documents without a single top level element) to be included. Simply use the xfragment as the top level element in the included document. It will be removed when the document is included.
 
-e.g. If I want to use xinclude to include a file containing the following fragments:
+e.g. If I want to use xi:include to include a file containing the following fragments:
 
 ::
 

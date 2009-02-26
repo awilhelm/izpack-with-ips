@@ -26,7 +26,7 @@ import com.izforge.izpack.installer.PanelAutomation;
 import com.izforge.izpack.installer.PanelAutomationHelper;
 import com.izforge.izpack.installer.ProcessPanelWorker;
 import com.izforge.izpack.util.AbstractUIProcessHandler;
-import net.n3.nanoxml.XMLElement;
+import com.izforge.izpack.adaptator.IXMLElement;
 
 import java.io.IOException;
 
@@ -50,7 +50,7 @@ public class ProcessPanelAutomationHelper extends PanelAutomationHelper implemen
      * @param installData installation parameters
      * @param panelRoot   unused.
      */
-    public void makeXMLData(AutomatedInstallData installData, XMLElement panelRoot)
+    public void makeXMLData(AutomatedInstallData installData, IXMLElement panelRoot)
     {
         // not used here - during automatic installation, no automatic
         // installation information is generated
@@ -62,7 +62,7 @@ public class ProcessPanelAutomationHelper extends PanelAutomationHelper implemen
      * @param panelRoot The panel XML tree root.
      * @return true if processes were run successfully.
      */
-    public boolean runAutomated(AutomatedInstallData idata, XMLElement panelRoot)
+    public boolean runAutomated(AutomatedInstallData idata, IXMLElement panelRoot)
     {
         try
         {
@@ -106,8 +106,9 @@ public class ProcessPanelAutomationHelper extends PanelAutomationHelper implemen
     /**
      * @see com.izforge.izpack.util.AbstractUIProcessHandler#finishProcessing()
      */
-    public void finishProcessing()
+    public void finishProcessing(boolean unlockPrev, boolean unlockNext)
     {
+        /* FIXME: maybe we should abort if unlockNext is false...? */
         System.out.println("[ Processing finished ]");
     }
 

@@ -19,6 +19,9 @@ package com.izforge.izpack.panels;
 
 import com.izforge.izpack.ExecutableFile;
 import com.izforge.izpack.Pack;
+import com.izforge.izpack.adaptator.*;
+import com.izforge.izpack.adaptator.impl.XMLElementImpl;
+import com.izforge.izpack.adaptator.impl.XMLParser;
 import com.izforge.izpack.gui.ButtonFactory;
 import com.izforge.izpack.gui.LabelFactory;
 import com.izforge.izpack.installer.*;
@@ -26,7 +29,6 @@ import com.izforge.izpack.util.*;
 import com.izforge.izpack.util.os.Shortcut;
 import com.izforge.izpack.util.os.unix.UnixHelper;
 import com.izforge.izpack.util.xml.XMLHelper;
-import net.n3.nanoxml.*;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -71,6 +73,8 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
 
     // ~ Static fields/initializers *********************************************************
 
+    public final static String SPEC_ATTRIBUTE_CONDITION="condition";
+    
     /**
      * SPEC_ATTRIBUTE_KDE_USERNAME ="KdeUsername"
      */
@@ -163,6 +167,11 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
      * SPEC_KEY_NOT_SUPPORTED = "notSupported"
      */
     private static final String SPEC_KEY_NOT_SUPPORTED = "notSupported";
+
+    /**
+     * SPEC_KEY_DEF_CUR_USER = "defaultCurrentUser"
+     */
+    private static final String SPEC_KEY_DEF_CUR_USER = "defaultCurrentUser";
 
     /**
      * SPEC_KEY_PROGRAM_GROUP = "programGroup"
@@ -461,10 +470,10 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
      * UI element instruct this panel to create shortcuts for all users
      */
     private JRadioButton allUsers;
-    
-    
+
+
     /**
-     * UI Element to show the shortcut creation Progress 
+     * UI Element to show the shortcut creation Progress
      */
     JProgressBar progressbar;
 
@@ -509,7 +518,7 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
     /**
      * The parsed result from reading the XML specification from the file
      */
-    private XMLElement spec;
+    private IXMLElement spec;
 
     /**
      * Set to true by analyzeShortcutSpec() if there are any desktop shortcuts to create.
@@ -520,6 +529,11 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
      * Tells wether to skip if the platform is not supported.
      */
     private boolean skipIfNotSupported = false;
+
+    /**
+     * Set 'true' to force current-user icons as default.
+     */
+    private boolean defaultCurrentUserFlag = false;
 
     /**
      * the one shortcut instance for reuse in many locations
@@ -838,7 +852,19 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
 
                 Debug.log("You " + perm + " write into '" + allUsersProgramsFolder + "'");
 
-                if (isRootUser)
+                final boolean rUserFlag;
+                if (defaultCurrentUserFlag)
+                {  //'defaultCurrentUser' element was specified
+                    rUserFlag = false;
+                    Debug.log("Element '" + SPEC_KEY_DEF_CUR_USER +
+                                                         "' was specified");
+                }
+                else
+                {  //'defaultCurrentUser' element not specified
+                    rUserFlag = isRootUser;
+                }
+
+                if (rUserFlag)
                 {
                     itsUserType = Shortcut.ALL_USERS;
                 }
@@ -849,7 +875,7 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
 
                 if (firstTime)
                 {
-                    buildUI(getProgramsFolder(isRootUser ? Shortcut.ALL_USERS : Shortcut.CURRENT_USER));
+                    buildUI(getProgramsFolder(rUserFlag ? Shortcut.ALL_USERS : Shortcut.CURRENT_USER));
                 }
 
                 // addSelectionList();
@@ -960,7 +986,6 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
         {
             input = ResourceManager.getInstance().getInputStream(SPEC_FILE_NAME);
         }
-
         if (input == null)
         {
             haveShortcutSpec = false;
@@ -968,17 +993,10 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
             return;
         }
 
-        // if( input == null )
-        // {
-        // haveShortcutSpec = false;
-        // return;
-        // }
-        // initialize the parser
         VariableSubstitutor substitutor = new VariableSubstitutor(idata.getVariables());
 
         // input.
         String substitutedSpec = substitutor.substitute(input, "xml");
-
         /*
          * TODO: internal flag mapped if( idata.isDebug() ) { System.out.println( "SUBSTITUDED
          * SHORTCUT SPEC" ); System.out.println(
@@ -988,13 +1006,10 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
          * "==================================================================" );
          * System.out.println( "==================================================================" ); }
          */
-        StdXMLParser parser = new StdXMLParser();
-        parser.setBuilder(XMLBuilderFactory.createXMLBuilder());
-        parser.setValidator(new NonValidator());
-        parser.setReader(StdXMLReader.stringReader(substitutedSpec));
+        IXMLParser parser = new XMLParser();
 
         // get the data
-        spec = (XMLElement) parser.parse();
+        spec = parser.parse(substitutedSpec);
 
         // close the stream
         input.close();
@@ -1018,14 +1033,18 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
             return;
         }
 
-        XMLElement skipper = spec.getFirstChildNamed(SPEC_KEY_SKIP_IFNOT_SUPPORTED);
+        IXMLElement skipper = spec.getFirstChildNamed(SPEC_KEY_SKIP_IFNOT_SUPPORTED);
         skipIfNotSupported = (skipper != null);
+
+              //set flag if 'defaultCurrentUser' element found:
+        defaultCurrentUserFlag =
+                   (spec.getFirstChildNamed(SPEC_KEY_DEF_CUR_USER) != null);
 
         // ----------------------------------------------------
         // find out if we should simulate a not supported
         // scenario
         // ----------------------------------------------------
-        XMLElement support = spec.getFirstChildNamed(SPEC_KEY_NOT_SUPPORTED);
+        IXMLElement support = spec.getFirstChildNamed(SPEC_KEY_NOT_SUPPORTED);
 
         if (support != null)
         {
@@ -1038,15 +1057,15 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
         // located
         // ----------------------------------------------------
 
-        XMLElement group = null;
-        Vector<XMLElement> groupSpecs = spec.getChildrenNamed(SPEC_KEY_PROGRAM_GROUP);
+        IXMLElement group = null;
+        Vector<IXMLElement> groupSpecs = spec.getChildrenNamed(SPEC_KEY_PROGRAM_GROUP);
         String selectedInstallGroup = idata.getVariable("INSTALL_GROUP");
         if (selectedInstallGroup != null)
         {
             //The user selected an InstallGroup before.
             //We may have some restrictions on the Installationgroup
             //search all defined ProgramGroups for the given InstallGroup
-            for (XMLElement g : groupSpecs)
+            for (IXMLElement g : groupSpecs)
             {
                 String instGrp = g.getAttribute(SPEC_ATTRIBUTE_INSTALLGROUP);
                 if (instGrp != null && selectedInstallGroup.equalsIgnoreCase(instGrp))
@@ -1092,8 +1111,8 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
         // created, containing all details about each shortcut
         // ----------------------------------------------------
         // String temp;
-        Vector<XMLElement> shortcutSpecs = spec.getChildrenNamed(SPEC_KEY_SHORTCUT);
-        XMLElement shortcutSpec;
+        Vector<IXMLElement> shortcutSpecs = spec.getChildrenNamed(SPEC_KEY_SHORTCUT);
+        IXMLElement shortcutSpec;
         ShortcutData data;
 
         shortCuts = new Vector<String>();
@@ -1213,7 +1232,7 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
 
             // the shortcut is not actually required for any of the selected packs // the shortcut
             // is not actually required for any of the selected packs
-            Vector<XMLElement> forPacks = shortcutSpec.getChildrenNamed(SPEC_KEY_PACKS);
+            Vector<IXMLElement> forPacks = shortcutSpec.getChildrenNamed(SPEC_KEY_PACKS);
 
             if (!shortcutRequiredFor(forPacks))
             {
@@ -1290,22 +1309,26 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
      * @param shortcutSpec
      * @return true if condtion is resolved positive - currently unimplemented: returns always true.
      */
-    private boolean checkConditions(XMLElement shortcutSpec)
+    private boolean checkConditions(IXMLElement shortcutSpec)
     {
-        /*
-         * Vector conditions = shortcutSpec.getChildrenNamed( Condition.CONDITION );
-         * 
-         * for( int i = 0; i < conditions.size(); i++ ) { Condition condition = new Condition(
-         * conditions.elementAt( i ) );
-         * 
-         * //System.out.println( "Readed: " + condition.toString( true ) ); boolean result =
-         * condition.eval();
-         * 
-         * if( result == false ) { System.out.println( "Unresolved Condition: " + condition );
-         * 
-         * return result; } }
-         */
-        return true; // If there is no Condition defined, just create the shortcut.
+        boolean result = true;
+         String conditionid = shortcutSpec.getAttribute(SPEC_ATTRIBUTE_CONDITION);
+         if (conditionid != null){
+             result = this.parent.getRules().isConditionTrue(conditionid);
+         }
+//          Vector conditions = shortcutSpec.getChildrenNamed( Condition.CONDITION );
+//          
+//          for( int i = 0; i < conditions.size(); i++ ) { Condition condition = new Condition(
+//          conditions.elementAt( i ) );
+//          
+//          //System.out.println( "Readed: " + condition.toString( true ) ); boolean result =
+//          condition.eval();
+//          
+//          if( result == false ) { System.out.println( "Unresolved Condition: " + condition );
+//          
+//          return result; } }
+         
+        return result; // If there is no Condition defined, just create the shortcut.
     }
 
     /*--------------------------------------------------------------------------*/
@@ -1436,18 +1459,18 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
         //fix: don't influence other shortcuts when altering group name...
         String gn = groupName;
         setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
-        
+
         progressbar = new JProgressBar( JProgressBar.HORIZONTAL, 0,shortcuts.size() );
-        
+
         constraints.gridx = col ;
         constraints.gridy = line + 7;
         constraints.gridwidth = 1;
         constraints.gridheight = 1;
         constraints.fill = GridBagConstraints.BOTH;
         layout.addLayoutComponent(progressbar, constraints);
-        add(progressbar);        
+        add(progressbar);
         invalidate();
-        
+
         progressbar.setStringPainted(true);
         invalidate();
 
@@ -1455,7 +1478,7 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
         for (int i = 0; i < shortcuts.size(); i++)
         {
             data = (ShortcutData) shortcuts.elementAt(i);
-            
+
             progressbar.setString( "create " + data.name + " [" + data.description + "]" );
 
             try
@@ -1628,7 +1651,7 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
      * that this panel is presented to the user AFTER the PacksPanel.
      * --------------------------------------------------------------------------
      */
-    private boolean shortcutRequiredFor(Vector<XMLElement> packs)
+    private boolean shortcutRequiredFor(Vector<IXMLElement> packs)
     {
         String selected;
         String required;
@@ -1817,15 +1840,19 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
         // ----------------------------------------------------
         if (shortcut.multipleUsers())
         {
+              //if 'defaultCurrentUser' specified, default to current user:
+            final boolean rUserFlag = defaultCurrentUserFlag ? false :
+                                                                 isRootUser;
+
             JPanel usersPanel = new JPanel(new GridLayout(2, 1));
             ButtonGroup usersGroup = new ButtonGroup();
             currentUser = new JRadioButton(parent.langpack
-                    .getString("ShortcutPanel.regular.currentUser"), !isRootUser);
+                    .getString("ShortcutPanel.regular.currentUser"), !rUserFlag);
             currentUser.addActionListener(this);
             usersGroup.add(currentUser);
             usersPanel.add(currentUser);
             allUsers = new JRadioButton(
-                    parent.langpack.getString("ShortcutPanel.regular.allUsers"), isRootUser);
+                    parent.langpack.getString("ShortcutPanel.regular.allUsers"), rUserFlag);
 
             Debug.log("allUsers.setEnabled(), I'm Root: " + isRootUser);
 
@@ -2285,7 +2312,7 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
      * is only stored once in a separate XML element, since there is only one.
      * --------------------------------------------------------------------------
      */
-    public void makeXMLData(XMLElement panelRoot)
+    public void makeXMLData(IXMLElement panelRoot)
     {
         // ----------------------------------------------------
         // if there are no shortcuts to create, shortcuts are
@@ -2304,12 +2331,12 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
         }
 
         ShortcutData data;
-        XMLElement dataElement;
+        IXMLElement dataElement;
 
         // ----------------------------------------------------
         // add the item that defines the name of the program group
         // ----------------------------------------------------
-        dataElement = new XMLElement(AUTO_KEY_PROGRAM_GROUP);
+        dataElement = new XMLElementImpl(AUTO_KEY_PROGRAM_GROUP,panelRoot);
         dataElement.setAttribute(AUTO_ATTRIBUTE_NAME, groupName);
         panelRoot.addChild(dataElement);
 
@@ -2320,7 +2347,7 @@ public class ShortcutPanel extends IzPanel implements ActionListener, ListSelect
         {
             Debug.log("entering makeXMLData");
             data = (ShortcutData) shortcuts.elementAt(i);
-            dataElement = new XMLElement(AUTO_KEY_SHORTCUT);
+            dataElement = new XMLElementImpl(AUTO_KEY_SHORTCUT,panelRoot);
 
             dataElement.setAttribute(AUTO_ATTRIBUTE_NAME, data.name);
             dataElement.setAttribute(AUTO_ATTRIBUTE_GROUP, (data.addToGroup ? Boolean.TRUE

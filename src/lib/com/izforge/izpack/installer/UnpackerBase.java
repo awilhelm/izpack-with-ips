@@ -35,6 +35,8 @@ import org.apache.regexp.RECompiler;
 import org.apache.regexp.RESyntaxException;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -72,6 +74,11 @@ public abstract class UnpackerBase implements IUnpacker
      */
     protected File absolute_installpath;
 
+    /**
+     * The absolute path of the source installation jar.
+     */
+    private File absolutInstallSource;
+    
     /**
      * The packs locale database.
      */
@@ -674,7 +681,7 @@ public abstract class UnpackerBase implements IUnpacker
         in[1] = UnpackerBase.class.getResourceAsStream("/res/IzPack.uninstaller-ext");
 
         // Me make the .uninstaller directory
-        String dest = IoHelper.translatePath("$INSTALL_PATH", vs) + File.separator + "Uninstaller";
+        String dest = IoHelper.translatePath(idata.info.getUninstallerPath(), vs);
         String jar = dest + File.separator + idata.info.getUninstallerName();
         File pathMaker = new File(dest);
         pathMaker.mkdirs();
@@ -938,6 +945,24 @@ public abstract class UnpackerBase implements IUnpacker
         Debug.trace("done.");
         oout.close();
         fout.close();
+    }
+    
+    protected File getAbsolutInstallSource() throws MalformedURLException
+    {
+        if (absolutInstallSource == null)
+        {
+            URL url = getClass().getResource("/info");
+            if (url.getPath().startsWith("file:"))
+            {
+                url = new URL(url.getFile());
+            }
+            absolutInstallSource = new File(url.getFile()).getAbsoluteFile().getParentFile();
+            if (absolutInstallSource.getAbsolutePath().endsWith("!"))
+            {
+                absolutInstallSource = absolutInstallSource.getParentFile();
+            }
+        }
+        return absolutInstallSource;
     }
 }
 
