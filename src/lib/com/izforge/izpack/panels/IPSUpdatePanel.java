@@ -172,6 +172,7 @@ public class IPSUpdatePanel extends IzPanel {
 	 */
 	public IPSUpdatePanel (InstallerFrame parent, InstallData data) {
 		super(parent, data, new IzPanelLayout());
+
 		add(new JScrollPane(new JTable(new FmriStateTableModel(
 				idata.installedIPSPackages))));
 	}

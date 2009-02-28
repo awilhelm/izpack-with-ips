@@ -27,16 +27,14 @@ public class IPSPrefsPanel extends IzPanel {
 	private static final long serialVersionUID = -7714579480159174801L;
 
 	/**
-	 * The label do the talking well enough...
+	 * Asks the user if he wants to be able to update with the installer.
 	 */
-	public final JCheckBox keep = new JCheckBox(
-			"Yes, I wanna keep this installer so that I can manually upgrade my IPS packages.");
+	public final JCheckBox keep = new JCheckBox(parent.langpack.getString("IPSPrefsPanel.keeptoupdate"));
 
 	/**
-	 * The label do the talking well enough...
+	 * Asks the user if he wants to install Sun Update Center.
 	 */
-	public final JCheckBox uc = new JCheckBox(
-			"Yes, I wanna install the Sun Update Center and use it to automatically upgrade my IPS packages.");
+	public final JCheckBox uc = new JCheckBox(parent.langpack.getString("IPSPrefsPanel.installupdatecenter"));
 
 	/**
 	 * Draw this panel.
@@ -48,7 +46,7 @@ public class IPSPrefsPanel extends IzPanel {
 	public IPSPrefsPanel (InstallerFrame parent, InstallData data) {
 		super(parent, data, new IzPanelLayout());
 		add(
-				createMultiLineLabel("Please check the ways you want the software to get upgraded."),
+				createMultiLineLabel(parent.langpack.getString("IPSPrefsPanel.instructions")),
 				NEXT_LINE);
 		add(IzPanelLayout.createVerticalStrut(20));
 		add(keep, NEXT_LINE);

@@ -187,13 +187,13 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		 * Display the Headline label.
 		 */
 		headLineLabel = new JLabel(
-				parent.langpack.getString("IPSPanel.headline"));
+				parent.langpack.getString("IPSPacksPanel.headline"));
 		headLineLabel.setAlignmentX(LEFT_ALIGNMENT);
 		add(headLineLabel);
 		/*
 		 * Display the packs list.
 		 */
-		packsTable = new JTable(new IPSTableModel(new String[] { "", "Name" },
+		packsTable = new JTable(new IPSTableModel(new String[] { "", parent.langpack.getString("IPSPacksPanel.name") },
 				data));
 		packsTable.setIntercellSpacing(new Dimension(0, 0));
 		packsTable.setShowGrid(false);
@@ -212,7 +212,7 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		descriptionArea.setLineWrap(true);
 		descriptionScroller = new JScrollPane();
 		descriptionScroller.setMinimumSize(new Dimension(getWidth(), 150));
-		descriptionScroller.setBorder(BorderFactory.createTitledBorder(parent.langpack.getString("IPSPanel.description")));
+		descriptionScroller.setBorder(BorderFactory.createTitledBorder(parent.langpack.getString("IPSPacksPanel.description")));
 		descriptionScroller.setViewportView(descriptionArea);
 		add(descriptionScroller);
 	}
@@ -248,7 +248,7 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		/*
 		 * If a version number is available, we add it before the description.
 		 */
-		if (selectedPack.getVersion() != null) desc = "Version : "
+		if (selectedPack.getVersion() != null) desc = parent.langpack.getString("IPSPacksPanel.version") + " : "
 				+ selectedPack.getVersion() + "\n" + desc;
 		/*
 		 * Put the description in the Textarea.

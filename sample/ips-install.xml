@@ -60,7 +60,7 @@
         <panel classname="LicencePanel"/>-->
         <panel classname="TargetPanel"/>
         <panel classname="PacksPanel"/>
-        <panel classname="IPSPanel"/>
+        <panel classname="IPSPacksPanel"/>
         <!--<panel classname="DataCheckPanel"/>       -->
         <panel classname="IPSInstallPanel"/>
         <!--<panel classname="IPSUpdatePanel"/>--> 

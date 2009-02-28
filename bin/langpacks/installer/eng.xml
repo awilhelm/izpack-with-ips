@@ -19,7 +19,7 @@
     <str id="JDKPathPanel.headline" txt="JDK Path"/>
     <str id="LicencePanel.headline" txt="Licensing Agreements"/>
     <str id="PacksPanel.headline" txt="Select Installation Packages"/>
-    <str id="IPSPanel.headline" txt="Select IPS Installation Packages"/>
+    <str id="IPSPacksPanel.headline" txt="Select IPS Installation Packages"/>
     <str id="ProcessPanel.headline" txt="Perform External Processes"/>
     <str id="ShortcutPanel.headline" txt="Setup Shortcuts"/>
     <str id="SimpleFinishPanel.headline" txt="Installation Finished"/>
@@ -107,8 +107,21 @@
     <str id="PacksPanel.notEnoughSpace" txt="Disk space required for the installation exceeds available disk space."/>
     <str id="PacksPanel.notAscertainable" txt="not ascertainable"/>
 
-     <!-- IPSPanel strings -->
-    <str id="IPSPanel.description" txt="Description"/>
+     <!-- IPSPacksPanel strings -->
+    <str id="IPSPacksPanel.description" txt="Description" />
+    <str id="IPSPacksPanel.name" txt="Packs' names" />
+    <str id="IPSPacksPanel.version" txt="Version" />
+
+    <!-- IPSPrefsPanel -->
+    <str id="IPSPrefsPanel.instructions" txt="Please check the ways you want the software to get upgraded." />
+    <str id="IPSPrefsPanel.keeptoupdate" txt="Yes, I wanna keep this installer so that I can manually upgrade my IPS packages." />
+    <str id="IPSPrefsPanel.installupdatecenter" txt="Yes, I wanna install the Sun Update Center and use it to automatically upgrade my IPS packages." />
+
+    <!-- ProxyPanel strings -->
+    <str id="ProxyPanel.instructions" txt="Put the infos of your proxy's in there (let this blank if you ain't none):" />
+    <str id="ProxyPanel.hostname" txt="Host name:" />
+    <str id="ProxyPanel.portnumber" txt="Port number:" />
+    <str id="ProxyPanel.proxytype" txt="Proxy type:" />
 
 	<!-- InstallPanel strings -->
 	<str id="InstallPanel.info" txt="Click 'Install!' to begin the installation process"/>

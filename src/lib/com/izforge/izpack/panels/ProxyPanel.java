@@ -76,15 +76,15 @@ public class ProxyPanel extends IzPanel {
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		add(new Box.Filler(MIN_DIM, MAX_DIM, MAX_DIM));
 		add(
-				createMultiLineLabel("Put the infos of your proxy's in there (let this blank if you ain't none):"),
+				createMultiLineLabel(parent.langpack.getString("ProxyPanel.instructions")),
 				NEXT_LINE);
 		add(IzPanelLayout.createVerticalStrut(20));
 		JPanel grid = new JPanel(new GridLayout(3, 2));
-		grid.add(new JLabel("Host name:"));
+		grid.add(new JLabel(parent.langpack.getString("ProxyPanel.hostname")));
 		grid.add(host);
-		grid.add(new JLabel("Port number:"));
+		grid.add(new JLabel(parent.langpack.getString("ProxyPanel.portnumber")));
 		grid.add(port);
-		grid.add(new JLabel("Proxy type:"));
+		grid.add(new JLabel(parent.langpack.getString("ProxyPanel.proxytype")));
 		grid.add(type);
 		add(grid);
 		add(new Box.Filler(MIN_DIM, MAX_DIM, MAX_DIM));
