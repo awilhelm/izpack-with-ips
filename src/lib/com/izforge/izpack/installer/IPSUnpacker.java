@@ -6,6 +6,8 @@
 package com.izforge.izpack.installer;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.zip.ZipInputStream;
 import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.util.AbstractUIProgressHandler;
@@ -13,12 +15,14 @@ import com.sun.pkg.client.ExtendedImage;
 import com.sun.pkg.client.ImagePlanProgressTracker;
 import com.sun.pkg.client.Image.FmriState;
 import com.sun.pkg.client.Image.ImagePlan;
+//import com.sun.pkg.bootstrap.Bootstrap;
 
 /**
  * An unpacker for the IPS packs.
  * 
  * @author Alexis Wilhelm
- * @since January 2009
+ * @author Romain Tertiaux
+ * @since January-March 2009
  */
 public class IPSUnpacker extends UnpackerBase {
 
@@ -175,12 +179,41 @@ public class IPSUnpacker extends UnpackerBase {
 			 * TODO Install the Sun Update Center if the user wants it to be
 			 * done.
 			 */
-			if (idata.installUpdateCenter) {}
+			if (idata.installUpdateCenter) {
+
+                /*try {
+                //Process proc = Runtime.getRuntime().exec("java -jar pkg-bootstrap.jar");
+
+                String[] argums = new String[1];
+                argums[0]="/home/aoyama/bootstrap.properties";
+
+                //Bootstrap.main(argums);
+
+                } catch (IOException e) {
+
+                    } */
+
+            }
 			/*
 			 * TODO Move this installer in the installation directory if the
 			 * user wants it to be done.
 			 */
-			if (idata.keepInstallerWhenDone) {}
+			if (idata.keepInstallerWhenDone) {
+
+
+
+                new File(idata.getInstallPath() + "/Updater").mkdir();
+
+                /* emitNotifications are temporaries */
+                if (copyFile(System.getProperties().getProperty("java.class.path"), idata.getInstallPath() + "/Updater/updater.jar"))
+                    handler.emitNotification("Updater créé.");
+                else handler.emitNotification("Impossible de créer l'updater.");
+
+                /* write a file in the jar, called "installer_done", with the install path in it
+                   to be able to test if we should display some panels or not (IPSPacksPanel, etc) ?
+                 */
+                
+            }
 			/*
 			 * Get the current state of the image.
 			 */
@@ -248,4 +281,52 @@ public class IPSUnpacker extends UnpackerBase {
 					e.getLocalizedMessage());
 		}
 	}
+
+    public static boolean copyFile(String inSource, String inDest )
+    {
+
+        try
+        {
+            File source = new File(inSource);
+            File dest = new File(inDest);            
+            // Create the new file
+
+            dest.createNewFile();
+
+            // Streams declaration
+            java.io.FileInputStream sourceFile = new java.io.FileInputStream(source);
+
+            try
+            {
+                java.io.FileOutputStream destinationFile =  new java.io.FileOutputStream(dest);
+
+                try
+                {
+                    // Read the file, 512KB at a time
+                    byte buffer[]=new byte[512*1024];
+                    int nbReads;
+
+                    while( (nbReads = sourceFile.read(buffer)) != -1 )
+                    {
+                        destinationFile.write(buffer, 0, nbReads);
+                    }
+                }
+                finally
+                {
+                    destinationFile.close();
+                }
+            }
+            finally
+            {
+                sourceFile.close();
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return false; // Error
+        }
+
+        return true; // OK
+    }
 }

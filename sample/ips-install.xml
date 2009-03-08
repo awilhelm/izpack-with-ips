@@ -61,11 +61,11 @@
         <panel classname="TargetPanel"/>
         <panel classname="PacksPanel"/>
         <panel classname="IPSPacksPanel"/>
+        <panel classname="IPSPrefsPanel"/>
         <!--<panel classname="DataCheckPanel"/>       -->
         <panel classname="IPSInstallPanel"/>
-        <!--<panel classname="IPSUpdatePanel"/>--> 
-        <panel classname="InstallPanel"/>
-        <panel classname="IPSInstallPanel"/>
+        <!--<panel classname="IPSUpdatePanel"/>-->
+        
         <panel classname="FinishPanel"/>
     </panels>
 

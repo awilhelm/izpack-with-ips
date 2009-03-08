@@ -107,7 +107,7 @@ public class IPSUpdatePanel extends IzPanel {
 			switch (col) {
 				case 0:
 					Fmri pkg = pkgs.get(row).fmri;
-					return String.format("%s (%s)", pkg.getName(),
+					return String.format("%s (%s, %s)", pkg.getName(), pkg.getVersion().getRelease(),
 							pkg.getAuthority());
 				case 1:
 					return pkgs.get(row).installed;

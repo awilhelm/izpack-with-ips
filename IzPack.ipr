@@ -316,6 +316,13 @@
       <JAVADOC />
       <SOURCES />
     </library>
+    <library name="ucbootstrap">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/lib/pkg-bootstrap.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
   </component>
 </project>
 

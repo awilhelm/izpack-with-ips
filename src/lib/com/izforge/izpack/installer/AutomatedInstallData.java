@@ -25,7 +25,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.zip.ZipOutputStream;
-import net.n3.nanoxml.XMLElement;
 import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.Info;
 import com.izforge.izpack.LocaleDatabase;

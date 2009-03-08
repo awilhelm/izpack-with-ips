@@ -40,6 +40,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="pkg" level="project" />
+    <orderEntry type="library" name="ucbootstrap" level="project" />
   </component>
 </module>
 
