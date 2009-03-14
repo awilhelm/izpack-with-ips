@@ -117,6 +117,11 @@
     <str id="IPSPrefsPanel.keeptoupdate" txt="Yes, I wanna keep this installer so that I can manually upgrade my IPS packages." />
     <str id="IPSPrefsPanel.installupdatecenter" txt="Yes, I wanna install the Sun Update Center and use it to automatically upgrade my IPS packages." />
 
+    <!-- IPSInstallPanel / IPSUnpacker -->
+    <str id="IPSInstallPanel.updatecentererror" txt="Sun Update Center have not been installed." />
+    <str id="IPSInstallPanel.updatecenterinstall" txt="Installation of Sun Update Center (take a few minutes)" />
+
+
     <!-- ProxyPanel strings -->
     <str id="ProxyPanel.instructions" txt="Put the infos of your proxy's in there (let this blank if you ain't none):" />
     <str id="ProxyPanel.hostname" txt="Host name:" />

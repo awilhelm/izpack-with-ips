@@ -217,6 +217,8 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		add(descriptionScroller);
 	}
 
+
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -234,6 +236,8 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		int i = 0;
 		for (IPSPack pack: idata.IPSPacks)
 			if ((Boolean) packsTable.getValueAt(i++, 0)) idata.selectedIPSPacks.add(pack);
+
+        
 	}
 
 	/**

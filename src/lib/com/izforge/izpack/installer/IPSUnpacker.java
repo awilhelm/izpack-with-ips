@@ -5,9 +5,7 @@
 
 package com.izforge.izpack.installer;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.zip.ZipInputStream;
 import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.util.AbstractUIProgressHandler;
@@ -15,7 +13,6 @@ import com.sun.pkg.client.ExtendedImage;
 import com.sun.pkg.client.ImagePlanProgressTracker;
 import com.sun.pkg.client.Image.FmriState;
 import com.sun.pkg.client.Image.ImagePlan;
-//import com.sun.pkg.bootstrap.Bootstrap;
 
 /**
  * An unpacker for the IPS packs.
@@ -176,31 +173,53 @@ public class IPSUnpacker extends UnpackerBase {
 			}
 			idata.selectedIPSPacks.clear();
 			/*
-			 * TODO Install the Sun Update Center if the user wants it to be
+			 * Install the Sun Update Center if the user wants it to be
 			 * done.
 			 */
-			if (idata.installUpdateCenter) {
+			if (idata.installUpdateCenter)
+            {
 
-                /*try {
-                //Process proc = Runtime.getRuntime().exec("java -jar pkg-bootstrap.jar");
+                handler.nextStep(langpack.getString("IPSInstallPanel.updatecenterinstall"), ++job, 1);
 
-                String[] argums = new String[1];
-                argums[0]="/home/aoyama/bootstrap.properties";
+                String configFile = idata.getInstallPath() + "/pkg/lib/bootstrap.properties";
 
-                //Bootstrap.main(argums);
+                /* Create the bootstrap configuration file */
+                PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(configFile)));
+                out.println("image.path=" + idata.getInstallPath());
+                out.println("install.pkg=true");
+                out.println("install.updatetool=true");
+                /* TODO : proxy.URL= */
+                out.close();
 
-                } catch (IOException e) {
+                /* Prepare the command line */
+                String[] args = new String[4];
+                args[0]="java";
+                args[1]="-jar";
+                args[2]=idata.getInstallPath() + "/pkg/lib/pkg-bootstrap.jar";
+                args[3]=configFile;
 
-                    } */
+                /* Launch the bootstrap */
+                /* The path /pkg/lib is to allow pkg-bootstrap.jar to find pkg-client.jar, which is needed */
+                Process bootstrap = Runtime.getRuntime().exec(args, null, new File(idata.getInstallPath() + "/pkg/lib"));
+
+                /* If the command didn't end as expected */
+                if (bootstrap.waitFor()!=0)
+                {
+                    handler.emitNotification(langpack.getString("IPSInstallPanel.updatecentererror"));
+                }
+                else
+                {
+                    /* Launch the Sun Update Center */
+                    Runtime.getRuntime().exec(idata.getInstallPath() + "/updatetool/bin/updatetool");
+                }
+
 
             }
 			/*
-			 * TODO Move this installer in the installation directory if the
+			 * Move this installer in the installation directory if the
 			 * user wants it to be done.
 			 */
 			if (idata.keepInstallerWhenDone) {
-
-
 
                 new File(idata.getInstallPath() + "/Updater").mkdir();
 

@@ -394,7 +394,7 @@
 	<!-- Compiles the installer src files -->
 	<target name="compile.installer" depends="prepare">
 		<javac srcdir="${src.dir}"
-		       classpath="${basedir}/lib/jakarta-regexp-1.3.jar;${basedir}/lib/pkg-client.jar;${basedir}/lib/pkg-bootstrap.jar"
+		       classpath="${basedir}/lib/jakarta-regexp-1.3.jar;${basedir}/lib/pkg-client.jar"
 		       destdir="${build.dir}"
 		       optimize="on"
 		       source="${compat.source}"
@@ -453,9 +453,6 @@
 			<zipfileset src="${basedir}/lib/jakarta-regexp-1.3.jar">
 				<include name="org/apache/regexp/*.class" />
 			</zipfileset>
-            <zipfileset src="${basedir}/lib/pkg-bootstrap.jar">
-                <include name="com/sun/pkg/bootstrap/*"/>
-            </zipfileset>
 			<fileset dir="${src.dir}">
 				<include name="com/izforge/izpack/installer/*.xml" />
 				<include name="com/izforge/izpack/installer/*.properties" />
@@ -1304,7 +1301,7 @@
     <!-- TODO : à supprimer -->
     <target name="compile.ipstest">
         <javac srcdir="${src.dir}"
-               classpath="${basedir}/lib/pkg-client.jar;${basedir}/lib/pkg-bootstrap.jar"
+               classpath="${basedir}/lib/pkg-client.jar"
                destdir="${build.dir}"
                optimize="on"
                source="${compat.source}"
@@ -1333,7 +1330,6 @@
                 <include name="com/sun/pkg/client/*"/>
             </zipfileset>
             <zipfileset src="lib/ant.jar"/>
-            <zipfileset src="${basedir}/lib/pkg-bootstrap.jar"/>
             <fileset dir="${build.dir}">
                 <include name="com/izforge/izpack/test.class"/>
             </fileset>
