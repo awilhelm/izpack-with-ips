@@ -120,7 +120,12 @@
     <!-- IPSInstallPanel / IPSUnpacker -->
     <str id="IPSInstallPanel.updatecentererror" txt="Sun Update Center n'a pas pu être installé." />
     <str id="IPSInstallPanel.updatecenterinstall" txt="Installation de Sun Update Center (peut durer quelques minutes)" />
-
+    <str id="IPSInstallPanel.beginning" txt="Préparation" />
+    <str id="IPSInstallPanel.emptyimage" txt="Extraction d'une image vide..."/>
+    <str id="IPSInstallPanel.update" txt="Mise à jour"/>
+    <str id="IPSInstallPanel.retrievingcatalog" txt="Récupération du catalogue..."/>
+    <str id="IPSInstallPanel.resolvingdependencies" txt="Résolution des dépendances..."/>
+            
     <!-- ProxyPanel strings -->
     <str id="ProxyPanel.instructions" txt="Saisissez les informations de votre proxy ici (ou laissez vide si vous n'en utilisez pas):"/>
     <str id="ProxyPanel.hostname" txt="Nom d'hôte:"/>

@@ -68,6 +68,7 @@ public class IPSUnpacker extends UnpackerBase {
 		public void startInstallPhase (int total) {
 			handler.progress(++step, String.format("Installing %d file%s...",
 					total, total > 1 ? "s" : ""));
+            handler.emitNotification("plop");
 		}
 
 		/**
@@ -145,14 +146,14 @@ public class IPSUnpacker extends UnpackerBase {
 			/*
 			 * Create and prepare a new IPS image in the installation directory.
 			 */
-			handler.nextStep("Begining", ++job, 1);
-			handler.progress(0, "Extracting an empty image...");
+			handler.nextStep(langpack.getString("beginning"), ++job, 1);
+			handler.progress(0, langpack.getString("emptyimage"));
 			img = getImage();
 			img.setProxy(idata.proxy);
 			/*
 			 * Remove installed packages not marked as installed.
 			 */
-			handler.nextStep("Update", ++job, 2);
+			handler.nextStep(langpack.getString("update"), ++job, 2);
 			if (!idata.unwantedIPSPackages.isEmpty()) {
 				trivial = false;
 				img.uninstallPackages(idata.unwantedIPSPackages);
@@ -188,7 +189,14 @@ public class IPSUnpacker extends UnpackerBase {
                 out.println("image.path=" + idata.getInstallPath());
                 out.println("install.pkg=true");
                 out.println("install.updatetool=true");
-                /* TODO : proxy.URL= */
+
+                if (idata.proxy.type().toString()=="HTTP")
+                    out.println("proxy.URL=http://" + idata.proxy.address().toString());
+                else if (idata.proxy.type().toString()=="SOCKS")
+                {
+                    /* TODO: */
+                }
+                                    
                 out.close();
 
                 /* Prepare the command line */
@@ -285,12 +293,12 @@ public class IPSUnpacker extends UnpackerBase {
 			 * Update an existing authority or add an additional authority for
 			 * packages retrieving.
 			 */
-			handler.progress(++step, "Retrieving the catalog...");
+			handler.progress(++step, langpack.getString("IPSInstallPanel.retrievingcatalog"));
 			img.addAuthority(pack.getAuthority());
 			/*
 			 * Install the packages this pack requires.
 			 */
-			handler.progress(++step, "Resolving dependencies...");
+			handler.progress(++step, langpack.getString("IPSInstallPanel.resolvingdependencies"));
 			ImagePlan plan = img.makeInstallPlan(pack.getPackages(img.getInventory()));            
 			plan.execute(new ImagePlanProgressTrackerForIzPack(handler, step));
 		}
