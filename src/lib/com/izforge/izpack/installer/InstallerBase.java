@@ -36,9 +36,9 @@ import java.util.Properties;
 import javax.swing.JOptionPane;
 
 import com.izforge.izpack.CustomData;
+import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.Info;
 import com.izforge.izpack.Pack;
-import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.adaptator.IXMLElement;
 import com.izforge.izpack.adaptator.impl.XMLParser;
 import com.izforge.izpack.compiler.DynamicVariable;
@@ -148,12 +148,13 @@ public class InstallerBase
         }
         objIn.close();
 
-        // We read the IPS Packs data
-        in = InstallerBase.class.getResourceAsStream("/ips-packs.info");
-        objIn = new ObjectInputStream(in);
-
-        installdata.IPSPacks = (List<IPSPack>) objIn.readObject();
-        objIn.close();
+        /*
+		 * We read the IPS Packs data
+		 */
+		objIn = new ObjectInputStream(
+				InstallerBase.class.getResourceAsStream("/ips-packs.info"));
+		installdata.ipsPacks = (List<IPSPack>) objIn.readObject();
+		objIn.close();
 
         // We determine the operating system and the initial installation path
         String dir;

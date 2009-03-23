@@ -50,7 +50,7 @@ import com.izforge.izpack.util.AbstractUIHandler;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.Housekeeper;
 import com.izforge.izpack.util.OsConstraint;
-import com.sun.pkg.client.Image;
+import com.sun.pkg.client.Image.FmriState;
 
 /**
  * Runs the install process in text only (no GUI) mode.
@@ -70,7 +70,7 @@ public class AutomatedInstaller extends InstallerBase
     /**
      * The automated installation data.
      */
-    private AutomatedInstallData idata = new AutomatedInstallData();
+    private AutomatedInstallData idata = AutomatedInstallData.getInstance();
 
     /**
      * The result of the installation.
@@ -155,20 +155,19 @@ public class AutomatedInstaller extends InstallerBase
             logWriter.flush();
             outJar.closeEntry();
 
-            // We write the ips packages log
-            outJar.putNextEntry(new ZipEntry("ips-install.log"));
-            logWriter = new BufferedWriter(new OutputStreamWriter(outJar));
-            logWriter.newLine();
-
-            for (Image.FmriState fmristate: this.idata.installedIPSPackages)
-            {
-                logWriter.write(fmristate.fmri.getName());
-                logWriter.newLine();
-            }
-
-            logWriter.flush();
-            outJar.closeEntry();
-    
+			/*
+			 * We write the IPS packages log.
+			 */
+			outJar.putNextEntry(new ZipEntry("ips-install.log"));
+			logWriter = new BufferedWriter(new OutputStreamWriter(outJar));
+			logWriter.newLine();
+			for (FmriState fmristate: this.idata.installedIPSPackages)
+			{
+				logWriter.write(fmristate.fmri.getName());
+				logWriter.newLine();
+			}
+			logWriter.flush();
+			outJar.closeEntry();
 
             // We write the uninstaller jar file log
             outJar.putNextEntry(new ZipEntry("jarlocation.log"));

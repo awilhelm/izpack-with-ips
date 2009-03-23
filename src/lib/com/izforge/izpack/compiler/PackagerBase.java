@@ -22,7 +22,11 @@
 
 package com.izforge.izpack.compiler;
 
-import com.izforge.izpack.*;
+import com.izforge.izpack.CustomData;
+import com.izforge.izpack.GUIPrefs;
+import com.izforge.izpack.IPSPack;
+import com.izforge.izpack.Info;
+import com.izforge.izpack.Panel;
 import com.izforge.izpack.compressor.PackCompressor;
 import com.izforge.izpack.compressor.PackCompressorFactory;
 import com.izforge.izpack.installer.InstallerRequirement;
@@ -82,10 +86,9 @@ public abstract class PackagerBase implements IPackager
     protected List<PackInfo> packsList = new ArrayList<PackInfo>();
 
     /**
-    * The IPS Packs informations.
-    */
-   protected List<IPSPack> IPSpacksList = new ArrayList<IPSPack>();
-
+	 * The IPS Packs informations.
+	 */
+	protected List<IPSPack> ipsPacksList = new ArrayList<IPSPack>();
 
     /**
      * The ordered langpack locale names.
@@ -256,14 +259,13 @@ public abstract class PackagerBase implements IPackager
         packsList.add(pack);
     }
 
-
-    /* (non-Javadoc)
-     * @see com.izforge.izpack.compiler.IPackager#addIPSPack(com.izforge.izpack.IPSPack)
-     */
-    public void addIPSPack(IPSPack ipspack)
-    {
-        IPSpacksList.add(ipspack);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public void addIPSPack (IPSPack pack)
+	{
+		ipsPacksList.add(pack);
+	}
 
     /* (non-Javadoc)
      * @see com.izforge.izpack.compiler.IPackager#addPanelJar(com.izforge.izpack.Panel, java.net.URL)
@@ -398,10 +400,9 @@ public abstract class PackagerBase implements IPackager
         writeInstallerResources();
         writeIncludedJars();
 
-        writeIPSPacks();
-
         // Pack File Data may be written to separate jars
         writePacks();
+        writeIPSPacks();
     }
 
     protected abstract void writeInstallerObject(String entryName, Object object) throws IOException;
@@ -414,15 +415,23 @@ public abstract class PackagerBase implements IPackager
 
     protected abstract void writePacks() throws Exception;
 
-    protected void writeIPSPacks() throws Exception
-    {
-        final int num = IPSpacksList.size();
-        sendMsg("Writing " + num + " IPS Pack" + (num > 1 ? "s" : "") + " into installer.");
-
-        // Each IPS Pack information is added to the installer
-        writeInstallerObject("ips-packs.info", IPSpacksList);
-    }
-
+    /**
+	 * Serialize the list containing the IPS packs and write it into the
+	 * installer.
+	 * 
+	 * @throws IOException When the pack list can't be written into the
+	 *         installer for some reason.
+	 */
+	protected void writeIPSPacks () throws IOException
+	{
+		final int num = ipsPacksList.size();
+		sendMsg(String.format("Writing %d IPS Pack%s into installer.", num,
+				num > 1 ? "s" : ""));
+		/*
+		 * Each IPS pack information is added to the installer.
+		 */
+		writeInstallerObject("ips-packs.info", ipsPacksList);
+	}
 
     /**
      * @return the dynamicvariables

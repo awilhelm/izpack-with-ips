@@ -58,8 +58,26 @@ public class InstallData extends AutomatedInstallData implements Serializable
     /**
      * Constructs a new instance of this class.
      */
-    protected InstallData()
+    private InstallData()
     {
         super();
     }
+
+	/**
+	 * This class should be a singleton. Therefore the one possible object will
+	 * be stored in this static member.
+	 */
+	private static InstallData self = null;
+
+	/**
+	 * @return the one possible object of this class
+	 */
+	public static InstallData getInstance ()
+	{
+		if (self == null)
+		{
+			self = new InstallData();
+		}
+		return self;
+	}
 }

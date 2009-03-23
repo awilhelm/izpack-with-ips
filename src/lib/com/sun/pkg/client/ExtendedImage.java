@@ -25,8 +25,8 @@ import java.util.zip.ZipInputStream;
  * @author Alexis Wilhelm
  * @since January 2009
  */
-public class ExtendedImage extends Image {
-
+public class ExtendedImage extends Image
+{
 	/**
 	 * Extract, at location given by dir, a predefined image suitable for
 	 * package operations. No attempt to retrieve catalogs will be made
@@ -38,18 +38,31 @@ public class ExtendedImage extends Image {
 	 * @throws Exception When the new image can't be created for some reason.
 	 */
 	public static ExtendedImage create (File dir, ZipInputStream template)
-			throws Exception {
-		for (;;) {
+			throws Exception
+	{
+		for (;;)
+		{
 			ZipEntry entry = template.getNextEntry();
-			if (entry == null) break;
-			if (entry.isDirectory()) new File(dir, entry.getName()).mkdirs();
-			else {
+			if (entry == null)
+			{
+				break;
+			}
+			if (entry.isDirectory())
+			{
+				new File(dir, entry.getName()).mkdirs();
+			}
+			else
+			{
 				File file = new File(dir, entry.getName());
 				FileOutputStream writer = new FileOutputStream(file);
 				byte[] buffer = new byte[0x1000];
-				for (;;) {
+				for (;;)
+				{
 					int len = template.read(buffer);
-					if (len == -1) break;
+					if (len == -1)
+					{
+						break;
+					}
 					writer.write(buffer, 0, len);
 				}
 				writer.close();
@@ -67,7 +80,8 @@ public class ExtendedImage extends Image {
 	 * @param path Path to this image's folder.
 	 * @throws Exception When the given folder contains no valid IPS image.
 	 */
-	public ExtendedImage (File path) throws Exception {
+	public ExtendedImage (File path) throws Exception
+	{
 		super(path);
 	}
 
@@ -77,7 +91,8 @@ public class ExtendedImage extends Image {
 	 * @param path This image's folder.
 	 * @throws Exception When the given folder contains no valid IPS image.
 	 */
-	public ExtendedImage (String path) throws Exception {
+	public ExtendedImage (String path) throws Exception
+	{
 		super(path);
 	}
 
@@ -88,7 +103,8 @@ public class ExtendedImage extends Image {
 	 * @param origin The URL prefix for the origin repository for the authority.
 	 * @throws IOException When this image can't be updated.
 	 */
-	public void addAuthority (URL origin) throws IOException {
+	public void addAuthority (URL origin) throws IOException
+	{
 		String authname = origin.getHost();
 		setAuthority(authname, origin, null);
 		saveConfig();
@@ -100,10 +116,13 @@ public class ExtendedImage extends Image {
 	 * 
 	 * @return A set of all available packages.
 	 */
-	public Set<String> getInventory () {
+	public Set<String> getInventory ()
+	{
 		HashSet<String> pkgset = new HashSet<String>();
 		for (FmriState s: getInventory(null, true))
+		{
 			pkgset.add(s.fmri.getName());
+		}
 		return pkgset;
 	}
 }

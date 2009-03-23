@@ -21,7 +21,6 @@ package com.izforge.izpack.uninstaller;
 
 import com.izforge.izpack.ExecutableFile;
 import com.izforge.izpack.event.UninstallerListener;
-import com.izforge.izpack.installer.ResourceNotFoundException;
 import com.izforge.izpack.installer.UninstallData;
 import com.izforge.izpack.util.AbstractUIProgressHandler;
 import com.izforge.izpack.util.Debug;
@@ -29,7 +28,6 @@ import com.izforge.izpack.util.FileExecutor;
 import com.izforge.izpack.util.OsVersion;
 import com.izforge.izpack.util.os.unix.ShellScript;
 import com.sun.pkg.client.Image;
-import com.sun.pkg.client.Fmri;
 
 import java.io.*;
 import java.util.*;
@@ -77,7 +75,8 @@ public class Destroyer extends Thread
     /**
      * The run method.
      */
-    public void run()
+    @Override
+	public void run()
     {
         try
         {
@@ -112,19 +111,17 @@ public class Destroyer extends Thread
                 handler.progress(i, file.getAbsolutePath());
             }
 
-
-            // Custem action listener stuff --- afterDeletion ----
+            // Custom action listener stuff --- afterDeletion ----
             informListeners(listeners[0], UninstallerListener.AFTER_DELETION, files, handler);
 
             if (OsVersion.IS_UNIX)
             {
-                ArrayList<String> rootScripts = getRootScripts(); 
+                ArrayList<String> rootScripts = getRootScripts();
                 Iterator<String> rsi = rootScripts.iterator();
                 while (rsi.hasNext())
                 {
-                  execRootScript((String) rsi.next() );                    
+                  execRootScript(rsi.next());
                 }
-                
             }
             // We make a complementary cleanup
             handler.progress(size, "[ cleanups ]");
@@ -132,38 +129,34 @@ public class Destroyer extends Thread
 
             handler.stopAction();
 
-            /* deletion of IPS Packs */
-            try
-            {
-
-                Image img = new Image(new File(installPath));
-                List<Image.FmriState> fmrilist = img.getInventory(new String[0], false);
-
-                if (!fmrilist.isEmpty())
-                {
-                    handler.startAction("IPSDestroyer", fmrilist.size()-1);
-
-                    int i=0;
-
-                    /* Deletion pack after pack to be able to have a progress bar */
-                    for (Image.FmriState b: fmrilist)
-                    {
-                        img.uninstallPackages(new String[] {b.fmri.getName()});
-                        handler.progress(i++, "Uninstalling of " + b.fmri.getName());
-                    }
-
-
-                    handler.stopAction();
-                }
-
-
-            }
-            catch (Exception e)
-            {
-                handler.emitWarning("Error", e.getMessage());            
-            }
-
-
+			/*
+			 * deletion of IPS Packs
+			 */
+			try
+			{
+				Image img = new Image(new File(installPath));
+				List<Image.FmriState> fmrilist = img.getInventory(
+						new String[0], false);
+				if (!fmrilist.isEmpty())
+				{
+					handler.startAction("IPSDestroyer", fmrilist.size() - 1);
+					int i = 0;
+					/*
+					 * Deletion pack after pack to be able to have a progress
+					 * bar
+					 */
+					for (Image.FmriState b: fmrilist)
+					{
+						img.uninstallPackages(new String[] { b.fmri.getName() });
+						handler.progress(i++, "Removing " + b.fmri.getName());
+					}
+					handler.stopAction();
+				}
+			}
+			catch (Exception e)
+			{
+				handler.emitWarning("Error", e.getMessage());
+			}
         }
         catch (Exception err)
         {
@@ -173,11 +166,11 @@ public class Destroyer extends Thread
             StackTraceElement str[] = err.getStackTrace();
             for (StackTraceElement aStr : str)
             {
-
+            	// TODO Write something in there.
             }
 
             StringWriter trace = new StringWriter();
-            //err.printStackTrace(new PrintStream);
+            // err.printStackTrace(new PrintStream);
             err.printStackTrace(new PrintWriter(trace));
 
             handler.emitError("exception caught", err.toString() + "\n" + trace.toString());
@@ -212,7 +205,7 @@ public class Destroyer extends Thread
      */
     private ArrayList<File> getFilesList() throws Exception
     {
-        // Initialisations
+        // Initializations
         TreeSet<File> files = new TreeSet<File>(Collections.reverseOrder());
         InputStream in = Destroyer.class.getResourceAsStream("/install.log");
         InputStreamReader inReader = new InputStreamReader(in);
@@ -257,9 +250,8 @@ public class Destroyer extends Thread
      * Gets the root files.
      *
      * @return The files which should remove by root for another user
-     * @throws Exception
      */
-    private ArrayList<String> getRootScripts() throws Exception
+    private ArrayList<String> getRootScripts()
     {
         ArrayList<String> result = new ArrayList<String>();
         
@@ -281,35 +273,6 @@ public class Destroyer extends Thread
           idx++;
         }
         return result;
-    }
-
-     /**
-     * Returns an ArrayList of the installed IPS packages to delete.
-     *
-     * @return The files list.
-     * @throws Exception Description of the Exception
-     */
-    private List<String> getIPSPackagesList() throws Exception
-    {
-        // Initialisations
-        List<String> packages = new ArrayList<String>();
-        InputStream in = Destroyer.class.getResourceAsStream("/ips-install.log");
-        InputStreamReader inReader = new InputStreamReader(in);
-        BufferedReader reader = new BufferedReader(inReader);
-
-        // We skip the first line (which is blank, don't know why yet)
-        reader.readLine();
-
-        // We read it
-        String read = reader.readLine();
-        while (read != null)
-        {
-            packages.add(read.toString());
-            read = reader.readLine();
-        }
-
-        // We return it
-        return packages;
     }
 
     /**
@@ -338,7 +301,7 @@ public class Destroyer extends Thread
     }
 
     /**
-     * Makes some reccursive cleanups.
+     * Makes some recursive cleanups.
      *
      * @param file The file to wipe.
      * @throws Exception Description of the Exception

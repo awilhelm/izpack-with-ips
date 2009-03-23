@@ -121,7 +121,7 @@ public class ResourceManager
     {
         if (ResourceManager.instance == null)
         {
-            ResourceManager.instance = new ResourceManager( new AutomatedInstallData() );
+            ResourceManager.instance = new ResourceManager( AutomatedInstallData.getInstance() );
         }
         return ResourceManager.instance;
     }
@@ -159,25 +159,18 @@ public class ResourceManager
         in = ResourceManager.class.getResourceAsStream(resourcePath);
         if (in != null)
         {
-            
             return resourcePath;
         }
-        
-        else
-        {
-            // if there's no language dependent resource found
-            resourcePath = this.resourceBasePath + resource;
-            in = ResourceManager.class.getResourceAsStream(resourcePath);
-            if (in != null)
-            {
-                return resourcePath;
-            }
-            else
-            {
-                throw new ResourceNotFoundException( "Cannot find named Resource: '" + this.resourceBasePath + resource + "' AND '" + this.resourceBasePath + resource + "_" + this.locale + "'"  );
-            }
-        }
-        
+		// if there's no language dependent resource found
+		resourcePath = this.resourceBasePath + resource;
+		in = ResourceManager.class.getResourceAsStream(resourcePath);
+		if (in != null)
+		{
+		    return resourcePath;
+		}
+		throw new ResourceNotFoundException(
+				"Cannot find named Resource: '" + this.resourceBasePath + resource
+				+ "' AND '" + this.resourceBasePath + resource + "_" + this.locale + "'");
     }
 
     /**

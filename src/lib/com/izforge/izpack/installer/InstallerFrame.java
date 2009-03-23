@@ -37,6 +37,7 @@ import com.izforge.izpack.gui.EtchedLineBorder;
 import com.izforge.izpack.gui.IconsDatabase;
 import com.izforge.izpack.rules.RulesEngine;
 import com.izforge.izpack.util.*;
+import com.sun.pkg.client.Image.FmriState;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -44,7 +45,6 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import com.sun.pkg.client.Image;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.*;
@@ -929,19 +929,19 @@ public class InstallerFrame extends JFrame {
             }
             outJar.closeEntry();
 
-            // We write the ips packages log
-            outJar.putNextEntry(new ZipEntry("ips-install.log"));
-            logWriter = new BufferedWriter(new OutputStreamWriter(outJar));
-            logWriter.newLine();
-
-            for (Image.FmriState fmristate: installdata.installedIPSPackages)
-            {
-                logWriter.write(fmristate.fmri.getName());
-                logWriter.newLine();
-            }
-
-            logWriter.flush();
-            outJar.closeEntry();
+			/*
+			 * We write the IPS packages log.
+			 */
+			outJar.putNextEntry(new ZipEntry("ips-install.log"));
+			logWriter = new BufferedWriter(new OutputStreamWriter(outJar));
+			logWriter.newLine();
+			for (FmriState fmristate: installdata.installedIPSPackages)
+			{
+				logWriter.write(fmristate.fmri.getName());
+				logWriter.newLine();
+			}
+			logWriter.flush();
+			outJar.closeEntry();
 
             // We write the uninstaller jar file log
             outJar.putNextEntry(new ZipEntry("jarlocation.log"));

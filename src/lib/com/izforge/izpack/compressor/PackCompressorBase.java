@@ -219,7 +219,7 @@ public abstract class PackCompressorBase implements PackCompressor
                                 outFile.close();
                             }
                         }
-                        url = tf.toURL();
+                        url = tf.toURI().toURL();
 
                     }
                 }

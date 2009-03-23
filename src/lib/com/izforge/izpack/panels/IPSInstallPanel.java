@@ -5,6 +5,7 @@
 
 package com.izforge.izpack.panels;
 
+import javax.swing.SwingUtilities;
 import com.izforge.izpack.installer.IPSUnpacker;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.installer.InstallerFrame;
@@ -24,8 +25,8 @@ import com.izforge.izpack.installer.InstallerFrame;
  * @see IPSPacksPanel
  * @see IPSUpdatePanel
  */
-public class IPSInstallPanel extends InstallPanel {
-
+public class IPSInstallPanel extends InstallPanel
+{
 	/**
 	 * Allow this panel to get serialized.
 	 */
@@ -38,7 +39,8 @@ public class IPSInstallPanel extends InstallPanel {
 	 * @param data The all important object describing everything we need for
 	 *        the installation.
 	 */
-	public IPSInstallPanel (InstallerFrame parent, InstallData data) {
+	public IPSInstallPanel (InstallerFrame parent, InstallData data)
+	{
 		super(parent, data);
 	}
 
@@ -50,20 +52,20 @@ public class IPSInstallPanel extends InstallPanel {
 	 * 
 	 * @see InstallPanel#panelActivate()
 	 */
-	/*
-	 * FIXME Sometimes I get an “Exception in thread "AWT-EventQueue-0"
-	 * java.lang.NoSuchMethodError: com.izforge.izpack.installer.IPSUnpacker:
-	 * method
-	 * <init>(Lcom/izforge/izpack/installer/AutomatedInstallData;Lcom/izforge
-	 * /izpack/util/AbstractUIProgressHandler;)V not found” here.
-	 */
 	@Override
-	public void panelActivate () {
+	public void panelActivate ()
+	{
 		parent.lockNextButton();
 		if (idata.selectedIPSPacks.isEmpty()
 				&& idata.selectedIPSPackages.isEmpty()
 				&& idata.unwantedIPSPackages.isEmpty()
-				&& IPSUnpacker.hasImage()) parent.skipPanel();
-		else new Thread(new IPSUnpacker(idata, this, parent)).start();
+				&& IPSUnpacker.hasImage())
+		{
+			parent.skipPanel();
+		}
+		else
+		{
+			SwingUtilities.invokeLater(new IPSUnpacker(idata, this, parent));
+		}
 	}
 }

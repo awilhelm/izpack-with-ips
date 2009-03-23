@@ -18,7 +18,11 @@
  */
 package com.izforge.izpack.compiler;
 
-import com.izforge.izpack.*;
+import com.izforge.izpack.CustomData;
+import com.izforge.izpack.GUIPrefs;
+import com.izforge.izpack.IPSPack;
+import com.izforge.izpack.Info;
+import com.izforge.izpack.Panel;
 import com.izforge.izpack.compressor.PackCompressor;
 import com.izforge.izpack.installer.InstallerRequirement;
 import com.izforge.izpack.rules.Condition;
@@ -107,12 +111,12 @@ public interface IPackager
      */
     public abstract void addPack(PackInfo pack);
 
-     /**
-     * Adds an IPS pack.
-     *
-     * @param ipspack contains information about the IPS Pack
-     */
-    public abstract void addIPSPack(IPSPack ipspack);
+	/**
+	 * Add an IPS pack to the installer.
+	 * 
+	 * @param pack The IPS pack we're to add.
+	 */
+    public abstract void addIPSPack(IPSPack pack);
 
     /**
      * Gets the packages list

@@ -505,15 +505,15 @@ public class Compiler extends Thread
         packager.addPack(pack);
     }
 
-     /**
-     * Add an IPS Pack to the installation.
-     *
-     * @param ipspack
-     */
-    public void addIPSPack(IPSPack ipspack)
-    {
-        packager.addIPSPack(ipspack);
-    }
+    /**
+    * Add an IPS Pack to the installation.
+    *
+    * @param pack The IPS pack we're to add.
+    */
+   public void addIPSPack(IPSPack pack)
+   {
+       packager.addIPSPack(pack);
+   }
 
     /**
      * Add a panel jar to the installation.

@@ -85,7 +85,7 @@ public class GUIInstaller extends InstallerBase
      */
     public GUIInstaller() throws Exception
     {
-        this.installdata = new InstallData();                
+        this.installdata = InstallData.getInstance();                
         
         // Loads the installation data
         loadInstallData(installdata);

@@ -3,7 +3,6 @@ package com.izforge.izpack.panels;
 
 import java.awt.Dimension;
 import java.awt.LayoutManager2;
-import java.util.Iterator;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -23,13 +22,13 @@ import com.izforge.izpack.installer.IzPanel;
 /**
  * @author Romain Tertiaux
  */
-public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
-
+public class IPSPacksPanel extends IzPanel implements ListSelectionListener
+{
 	/**
 	 * JTable Table Model
 	 */
-	private static final class IPSTableModel extends AbstractTableModel {
-
+	private static final class IPSTableModel extends AbstractTableModel
+	{
 		/**
 		 * This allows this model to get serialized.
 		 */
@@ -43,13 +42,14 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		/**
 		 * A list of (checked, name) pairs.
 		 */
-		private Object[][] data;
+		private final Object[][] data;
 
 		/**
 		 * @param inCol
 		 * @param inData
 		 */
-		public IPSTableModel (String[] inCol, Object[][] inData) {
+		public IPSTableModel (String[] inCol, Object[][] inData)
+		{
 			columnNames = inCol;
 			data = inData;
 		}
@@ -60,14 +60,16 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		 * @see AbstractTableModel#getColumnClass(int)
 		 */
 		@Override
-		public Class<?> getColumnClass (int c) {
+		public Class<?> getColumnClass (int c)
+		{
 			return getValueAt(0, c).getClass();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		public int getColumnCount () {
+		public int getColumnCount ()
+		{
 			return columnNames.length;
 		}
 
@@ -75,21 +77,24 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String getColumnName (int col) {
+		public String getColumnName (int col)
+		{
 			return columnNames[col];
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		public int getRowCount () {
+		public int getRowCount ()
+		{
 			return data.length;
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		public Object getValueAt (int row, int col) {
+		public Object getValueAt (int row, int col)
+		{
 			return data[row][col];
 		}
 
@@ -99,7 +104,8 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		 * @see AbstractTableModel#isCellEditable(int, int)
 		 */
 		@Override
-		public boolean isCellEditable (int row, int col) {
+		public boolean isCellEditable (int row, int col)
+		{
 			return col == 0;
 		}
 
@@ -107,7 +113,8 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void setValueAt (Object value, int row, int col) {
+		public void setValueAt (Object value, int row, int col)
+		{
 			data[row][col] = value;
 			fireTableCellUpdated(row, col);
 		}
@@ -144,7 +151,8 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 	 * @param parent The parent.
 	 * @param idata The installation data.
 	 */
-	public IPSPacksPanel (InstallerFrame parent, InstallData idata) {
+	public IPSPacksPanel (InstallerFrame parent, InstallData idata)
+	{
 		this(parent, idata, new IzPanelLayout());
 	}
 
@@ -156,24 +164,21 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 	 * @param layout layout manager to be used with this IzPanel.
 	 */
 	public IPSPacksPanel (InstallerFrame parent, InstallData idata,
-			LayoutManager2 layout) {
+			LayoutManager2 layout)
+	{
 		super(parent, idata, layout);
-		Object[][] data = new Object[idata.IPSPacks.size()][2];
+		Object[][] data = new Object[idata.ipsPacks.size()][2];
 		/*
 		 * We make the data for the packs table
 		 */
-		Iterator<IPSPack> packIter = idata.IPSPacks.iterator();
-		for (int i = 0; packIter.hasNext(); i++) {
-			IPSPack ipsPack = packIter.next();
-			data[i][0] = ipsPack.isCheckedByDefault();
-			data[i][1] = ipsPack.getName();
+		int i = 0;
+		for (IPSPack pack: idata.ipsPacks)
+		{
+			data[i][0] = pack.isCheckedByDefault();
+			data[i][1] = pack.getName();
+			++i;
 		}
 		createLayout(data);
-		/*
-		 * At end of layouting we should call the completeLayout method also
-		 * they do nothing.
-		 */
-		getLayoutHelper().completeLayout();
 	}
 
 	/**
@@ -181,7 +186,8 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 	 * 
 	 * @param data
 	 */
-	public void createLayout (Object[][] data) {
+	public void createLayout (Object[][] data)
+	{
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		/*
 		 * Display the Headline label.
@@ -193,8 +199,8 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		/*
 		 * Display the packs list.
 		 */
-		packsTable = new JTable(new IPSTableModel(new String[] { "", parent.langpack.getString("IPSPacksPanel.name") },
-				data));
+		packsTable = new JTable(new IPSTableModel(new String[] { "",
+				parent.langpack.getString("IPSPacksPanel.name") }, data));
 		packsTable.setIntercellSpacing(new Dimension(0, 0));
 		packsTable.setShowGrid(false);
 		packsTable.getColumnModel().getColumn(0).setMaxWidth(30);
@@ -215,15 +221,19 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		descriptionScroller.setBorder(BorderFactory.createTitledBorder(parent.langpack.getString("IPSPacksPanel.description")));
 		descriptionScroller.setViewportView(descriptionArea);
 		add(descriptionScroller);
+		/*
+		 * At end of layouting we should call the completeLayout method also
+		 * they do nothing.
+		 */
+		getLayoutHelper().completeLayout();
 	}
-
-
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void panelDeactivate () {
+	public void panelDeactivate ()
+	{
 		/*
 		 * If the user has pressed the previous button, some packs may have been
 		 * added yet, so we clear the list.
@@ -234,26 +244,33 @@ public class IPSPacksPanel extends IzPanel implements ListSelectionListener {
 		 * selected list or not.
 		 */
 		int i = 0;
-		for (IPSPack pack: idata.IPSPacks)
-			if ((Boolean) packsTable.getValueAt(i++, 0)) idata.selectedIPSPacks.add(pack);
-
-        
+		for (IPSPack pack: idata.ipsPacks)
+		{
+			if ((Boolean) packsTable.getValueAt(i++, 0))
+			{
+				idata.selectedIPSPacks.add(pack);
+			}
+		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public void valueChanged (ListSelectionEvent e) {
+	public void valueChanged (ListSelectionEvent e)
+	{
 		/*
 		 * Get the description.
 		 */
-		IPSPack selectedPack = idata.IPSPacks.get(packsTable.getSelectedRow());
+		IPSPack selectedPack = idata.ipsPacks.get(packsTable.getSelectedRow());
 		String desc = selectedPack.getDescription();
 		/*
 		 * If a version number is available, we add it before the description.
 		 */
-		if (selectedPack.getVersion() != null) desc = parent.langpack.getString("IPSPacksPanel.version") + " : "
-				+ selectedPack.getVersion() + "\n" + desc;
+		if (selectedPack.getVersion() != null)
+		{
+			desc = parent.langpack.getString("IPSPacksPanel.version") + " "
+					+ selectedPack.getVersion() + "\n" + desc;
+		}
 		/*
 		 * Put the description in the Textarea.
 		 */

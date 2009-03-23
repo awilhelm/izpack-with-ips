@@ -29,8 +29,8 @@ import com.izforge.izpack.installer.IzPanel;
  * @author Alexis Wilhelm
  * @since February 2009
  */
-public class ProxyPanel extends IzPanel {
-
+public class ProxyPanel extends IzPanel
+{
 	/**
 	 * This allows this panel to get serialized.
 	 */
@@ -71,20 +71,21 @@ public class ProxyPanel extends IzPanel {
 	 * @param data The all important object describing everything we need for
 	 *        the installation.
 	 */
-	public ProxyPanel (InstallerFrame parent, InstallData data) {
+	public ProxyPanel (InstallerFrame parent, InstallData data)
+	{
 		super(parent, data);
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		add(new Box.Filler(MIN_DIM, MAX_DIM, MAX_DIM));
 		add(
-				createMultiLineLabel(parent.langpack.getString("ProxyPanel.instructions")),
+				createMultiLineLabel(idata.langpack.getString("ProxyPanel.instructions")),
 				NEXT_LINE);
 		add(IzPanelLayout.createVerticalStrut(20));
 		JPanel grid = new JPanel(new GridLayout(3, 2));
-		grid.add(new JLabel(parent.langpack.getString("ProxyPanel.hostname")));
+		grid.add(new JLabel(idata.langpack.getString("ProxyPanel.hostname")));
 		grid.add(host);
-		grid.add(new JLabel(parent.langpack.getString("ProxyPanel.portnumber")));
+		grid.add(new JLabel(idata.langpack.getString("ProxyPanel.portnumber")));
 		grid.add(port);
-		grid.add(new JLabel(parent.langpack.getString("ProxyPanel.proxytype")));
+		grid.add(new JLabel(idata.langpack.getString("ProxyPanel.proxytype")));
 		grid.add(type);
 		add(grid);
 		add(new Box.Filler(MIN_DIM, MAX_DIM, MAX_DIM));
@@ -97,13 +98,16 @@ public class ProxyPanel extends IzPanel {
 	 * @see IzPanel#panelDeactivate()
 	 */
 	@Override
-	public void panelDeactivate () {
-		try {
+	public void panelDeactivate ()
+	{
+		try
+		{
 			idata.proxy = new Proxy((Proxy.Type) type.getSelectedItem(),
 					new InetSocketAddress(host.getText(),
 							(Integer) port.getValue()));
 		}
-		catch (Exception e) {
+		catch (Exception e)
+		{
 			idata.proxy = Proxy.NO_PROXY;
 		}
 	}

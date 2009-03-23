@@ -16,10 +16,11 @@ import java.util.List;
  * A pack useful for installing IPS packages.
  * 
  * @author Alexis Wilhelm
+ * @author Romain Tertiaux
  * @since January 2009
  */
-public class IPSPack implements Serializable {
-
+public class IPSPack implements Serializable
+{
 	/**
 	 * Allow this pack to get serialized.
 	 */
@@ -28,32 +29,32 @@ public class IPSPack implements Serializable {
 	/**
 	 * The origin URL for this pack's authority.
 	 */
-	private URL authority;
+	private final URL authority;
 
 	/**
 	 * This pack's name.
 	 */
-	private String name;
+	private final String name;
 
 	/**
 	 * A list of wanted and unwanted packages.
 	 */
-	private List<Clude> cludes;
+	private final List<Clude> cludes;
 
 	/**
 	 * The version that the installer will try to get, if available.
 	 */
-	private String version;
+	private final String version;
 
 	/**
 	 * The description of this pack's.
 	 */
-	private String description;
+	private final String description;
 
 	/**
 	 * Whether this pack is checked by default in the installer's pack list.
 	 */
-	private Boolean checked;
+	private final Boolean checked;
 
 	/**
 	 * @param authority The authority for this pack.
@@ -68,7 +69,8 @@ public class IPSPack implements Serializable {
 	 */
 	public IPSPack (String authority, String name, String description,
 			String version, Boolean checked, List<Clude> cludes)
-			throws MalformedURLException {
+			throws MalformedURLException
+	{
 		this.name = name;
 		this.description = description;
 		this.version = version;
@@ -80,21 +82,24 @@ public class IPSPack implements Serializable {
 	/**
 	 * @return The origin URL for this pack's authority.
 	 */
-	public URL getAuthority () {
+	public URL getAuthority ()
+	{
 		return authority;
 	}
 
 	/**
 	 * @return The description of this pack's.
 	 */
-	public String getDescription () {
+	public String getDescription ()
+	{
 		return description;
 	}
 
 	/**
 	 * @return This pack's name.
 	 */
-	public String getName () {
+	public String getName ()
+	{
 		return name;
 	}
 
@@ -104,27 +109,31 @@ public class IPSPack implements Serializable {
 	 * @param candidates A set of all available packages.
 	 * @return An array filled with names of the packages this pack requires.
 	 */
-	public String[] getPackages (Collection<String> candidates) {
+	public String[] getPackages (Collection<String> candidates)
+	{
 		/*
 		 * Start with an empty set if the first clude describes an inclusion,
 		 * and with every available packages if the first clude is an exclusion
 		 * or if there is no clude at all.
 		 */
 		Collection<String> pkgset = !cludes.isEmpty()
-				&& cludes.get(0).isIncluded()? new HashSet<String>()
+				&& cludes.get(0).isIncluded() ? new HashSet<String>()
 				: new HashSet<String>(candidates);
 		/*
 		 * Refine the set according to every cludes.
 		 */
 		for (Clude c: cludes)
+		{
 			c.filter(pkgset, candidates);
+		}
 		return pkgset.toArray(new String[0]);
 	}
 
 	/**
 	 * @return The version that the installer will try to get, if available.
 	 */
-	public String getVersion () {
+	public String getVersion ()
+	{
 		return version;
 	}
 
@@ -132,7 +141,8 @@ public class IPSPack implements Serializable {
 	 * @return True when this pack will be initially checked in the installer's
 	 *         pack list, false otherwise.
 	 */
-	public Boolean isCheckedByDefault () {
+	public Boolean isCheckedByDefault ()
+	{
 		return checked;
 	}
 }

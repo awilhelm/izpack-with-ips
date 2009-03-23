@@ -26,12 +26,50 @@
 
 package com.izforge.izpack.compiler;
 
-import com.izforge.izpack.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
+import java.util.Vector;
+import java.util.jar.JarInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import org.apache.tools.ant.DirectoryScanner;
+import com.izforge.izpack.Clude;
+import com.izforge.izpack.CustomData;
 import com.izforge.izpack.ExecutableFile;
 import com.izforge.izpack.GUIPrefs;
+import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.Info;
 import com.izforge.izpack.PackFile;
 import com.izforge.izpack.Panel;
+import com.izforge.izpack.ParsableFile;
+import com.izforge.izpack.UpdateCheck;
 import com.izforge.izpack.adaptator.IXMLElement;
 import com.izforge.izpack.adaptator.IXMLParser;
 import com.izforge.izpack.adaptator.IXMLWriter;
@@ -48,24 +86,10 @@ import com.izforge.izpack.installer.PanelAction.ActionStage;
 import com.izforge.izpack.panels.HelpWindow;
 import com.izforge.izpack.rules.Condition;
 import com.izforge.izpack.rules.RulesEngine;
+import com.izforge.izpack.updater.Updater;
 import com.izforge.izpack.util.Debug;
 import com.izforge.izpack.util.OsConstraint;
 import com.izforge.izpack.util.VariableSubstitutor;
-import org.apache.tools.ant.DirectoryScanner;
-
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.*;
-import java.util.jar.JarInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 
 /**
@@ -351,6 +375,7 @@ public class CompilerConfig extends Thread {
         addPanels(data);
         addPacks(data);
         addInstallerRequirement(data);
+        addUpdater(data);
 
         // merge multiple packlang.xml files
         mergePacksLangFiles();
@@ -634,12 +659,13 @@ public class CompilerConfig extends Thread {
         Vector<IXMLElement> packElements = root.getChildrenNamed("pack");
         Vector<IXMLElement> refPackElements = root.getChildrenNamed("refpack");
         Vector<IXMLElement> refPackSets = root.getChildrenNamed("refpackset");
-        Vector<IXMLElement> IPSPackElements = root.getChildrenNamed("ips-pack");
-
-        if (packElements.isEmpty() && refPackElements.isEmpty() && refPackSets.isEmpty() && IPSPackElements.isEmpty())
-        {
-            parseError(root, "<packs> requires a <pack>, <refpack>, <refpackset> or <ips-pack>");
-        }
+        Vector<IXMLElement> ipsPackElements = root.getChildrenNamed("ips-pack");
+        if (packElements.isEmpty() && refPackElements.isEmpty()
+				&& refPackSets.isEmpty() && ipsPackElements.isEmpty())
+		{
+			parseError(root,
+					"<packs> requires a <pack>, <refpack>, <refpackset> or <ips-pack>");
+		}
 
         File baseDir = new File(basedir);
 
@@ -1110,85 +1136,169 @@ public class CompilerConfig extends Thread {
         }
         
         addIPSPacksSingle(root);
-        
+
         notifyCompilerListener("addPacksSingle", CompilerListener.END, data);
     }
 
 	/**
-	 * Add IPS packs to the installer without checking the dependencies and
-	 * includes.
+	 * Adds IPS packs to the installer and prepare the required resources and
+	 * libraries.
+	 * <p>
+	 * Beside the inclusion of the IPS packages, this method takes care of:
+	 * <ul>
+	 * <li>The inclusion of the Java API for IPS.</li>
+	 * <li>The inclusion of the empty IPS image. Note that you can use a fancy
+	 * image instead of the default one by setting the <em>ips-empty-image</em>
+	 * variable to the path of a zip containing your image.</li>
+	 * </ul>
+	 * </p>
 	 * 
 	 * @param data The root &lt;packs&gt; element, containing everything we need
 	 *        to know about the packs we're to install.
-	 * @throws CompilerException When anything goes wrong with the compilation.
+	 * @throws CompilerException When anything goes wrong with the
+	 *         compilation...
 	 * @author Alexis Wilhelm
 	 * @since January 2009
 	 */
-	private void addIPSPacksSingle (IXMLElement data) throws CompilerException {
+	private void addIPSPacksSingle (IXMLElement data) throws CompilerException
+	{
+		notifyCompilerListener("addIPSPacksSingle", CompilerListener.BEGIN,
+				data);
 		/*
-		 * Let's begin!
+		 * Get the IPS packs as described in the XML descriptor.
 		 */
-		notifyCompilerListener("addIPSPacks", CompilerListener.BEGIN, data);
+		List<IXMLElement> packs = data.getChildrenNamed("ips-pack");
 		/*
-		 * Get each IPS pack described in the XML descriptor.
+		 * Prepare some required resources.
 		 */
-		Vector<IXMLElement> packs = data.getChildrenNamed("ips-pack");
-		/*
-		 * Add the resources we need. Those include the empty IPS image and the
-		 * pkg Java API.
-		 */
-		if (packs.size() > 0) {
-			try {
-				compiler.addResource(IPSUnpacker.template, new File(
-						Compiler.IZPACK_HOME, "emptyimage.zip").toURI().toURL());
+		if (!packs.isEmpty())
+		{
+			/*
+			 * Include the Java API for handling IPS packages.
+			 */
+			try
+			{
 				compiler.addJarContent(new File(Compiler.IZPACK_HOME,
 						"lib/pkg-client.jar").toURI().toURL());
 			}
-			catch (MalformedURLException e) {
-				throw new CompilerException("Resource not found: "
-						+ e.getLocalizedMessage());
+			catch (MalformedURLException e)
+			{
+				parseError(data, "Couldn't find the Java API for IPS!!", e);
+			}
+			/*
+			 * Include a fancy empty IPS image, or the default image if no such
+			 * option is set.
+			 */
+			try
+			{
+				compiler.addResource(
+						IPSUnpacker.TEMPLATE,
+						new File(compiler.getVariables().getProperty(
+								"ips-empty-image",
+								Compiler.IZPACK_HOME + "emptyimage.zip")).toURI().toURL());
+			}
+			catch (MalformedURLException e)
+			{
+				parseError(data, "Couldn't find the empty IPS image!!", e);
 			}
 		}
-		for (IXMLElement pack: packs) {
+		/*
+		 * Now we're ready to add the packs.
+		 */
+		for (IXMLElement pack: packs)
+		{
 			/*
-			 * Build the package requirements. This means, we create a new clude
+			 * Build the package requirements. That is, we create a new clude
 			 * for each <include> or <exclude> element in the pack and add it to
 			 * the pack's clude list.
 			 */
 			List<Clude> cludes = new ArrayList<Clude>();
-			Vector<IXMLElement> nodes = pack.getChildren();
-			for (IXMLElement element: nodes) {
+			for (IXMLElement element: pack.getChildren())
+			{
 				String tagname = element.getName();
 				String pattern = element.getAttribute("name");
-				if (tagname.equals("include")) cludes.add(new Clude(pattern,
-						true));
-				else if (tagname.equals("exclude")) cludes.add(new Clude(
-						pattern, false));
+				if (tagname.equals("include"))
+				{
+					cludes.add(new Clude(pattern, true));
+				}
+				else if (tagname.equals("exclude"))
+				{
+					cludes.add(new Clude(pattern, false));
+				}
 			}
-			try {
-				/*
-				 * Add a new IPSPack to the list.
-				 */
+			/*
+			 * Add a new IPSPack to the list.
+			 */
+			try
+			{
 				compiler.addIPSPack(new IPSPack(requireAttribute(pack, "src"),
 						requireAttribute(pack, "name"), requireChildNamed(pack,
 								"description").getContent(),
 						pack.getAttribute("version"),
 						Boolean.valueOf(pack.getAttribute("checked")), cludes));
 			}
-			catch (MalformedURLException e) {
-				throw new CompilerException(
-						"Invalid authority URL in this pack.");
+			catch (MalformedURLException e)
+			{
+				parseError(pack,
+						"An invalid authority URL was set for this pack.", e);
 			}
 		}
+		notifyCompilerListener("addIPSPacksSingle", CompilerListener.END, data);
+	}
+
+	/**
+	 * Adds an updater to the installer.
+	 * <p>
+	 * The updater is just another kind of installer, so it's described in an
+	 * XML file the same way as an installer. The path leading to this XML file
+	 * should be written in the "updater" variable (or whichever is named in the
+	 * {@link Updater#VARIABLE_NAME} constant).
+	 * </p>
+	 * 
+	 * @param data The root &lt;installation&gt; element.
+	 * @throws CompilerException When the updater can't be compiled.
+	 * @author Alexis Wilhelm
+	 * @since March 2009
+	 */
+	protected void addUpdater (IXMLElement data) throws CompilerException
+	{
+		notifyCompilerListener("addUpdater", CompilerListener.BEGIN, data);
 		/*
-		 * Over.
+		 * Get the updater XML descriptor from the variables.
 		 */
-		notifyCompilerListener("addIPSPacks", CompilerListener.END, data);
+		String file = compiler.getVariables().getProperty(Updater.VARIABLE_NAME);
+		if (file != null)
+		{
+			try
+			{
+				/*
+				 * Create a temporary file in order to put the updater in it.
+				 */
+				File updater = File.createTempFile(Updater.VARIABLE_NAME, ".jar");
+				updater.deleteOnExit();
+				/*
+				 * Compile the updater.
+				 */
+				CompilerConfig cc = new CompilerConfig(file, basedir,
+						compiler.getKind(), updater.getAbsolutePath());
+				cc.executeCompiler();
+				cc.join();
+				/*
+				 * Move the updater from the temporary file to the resources in
+				 * the installer's Jar.
+				 */
+				compiler.addResource(Updater.FILE_NAME, updater.toURI().toURL());
+			}
+			catch (Exception e)
+			{
+				parseError(data, "The updater couldn't get compiled!", e);
+			}
+		}
+		notifyCompilerListener("addUpdater", CompilerListener.END, data);
 	}
 
     private IXMLElement readRefPackData(String refFileName, boolean isselfcontained)
             throws CompilerException {
-
         File refXMLFile = new File(refFileName);
         if (!refXMLFile.isAbsolute())
         {
@@ -1586,7 +1696,6 @@ public class CompilerConfig extends Thread {
         notifyCompilerListener("addPanels", CompilerListener.END, data);
     }
 
-
     /**
      * Adds the resources.
      *
@@ -1646,7 +1755,7 @@ public class CompilerConfig extends Thread {
                     reader.close();
                     writer.close();
 
-                    originalUrl = recodedFile.toURL();
+                    originalUrl = recodedFile.toURI().toURL();
                 }
 
                 if (parsexml || (!"".equals(encoding)) || (substitute && !compiler.getVariables().isEmpty()))
@@ -1944,30 +2053,21 @@ public class CompilerConfig extends Thread {
         notifyCompilerListener("addInfo", CompilerListener.END, data);
     }
 
-    /**
-     * Variable declaration is a fragment of the xml file. For example: <p/>
-     * <p/>
-     * <pre>
-     * &lt;p/&gt;
-     * &lt;p/&gt;
-     * &lt;p/&gt;
-     * &lt;p/&gt;
-     *        &lt;variables&gt;
-     *          &lt;variable name=&quot;nom&quot; value=&quot;value&quot;/&gt;
-     *          &lt;variable name=&quot;foo&quot; value=&quot;pippo&quot;/&gt;
-     *        &lt;/variables&gt;
-     * &lt;p/&gt;
-     * &lt;p/&gt;
-     * &lt;p/&gt;
-     * &lt;p/&gt;
-     * </pre>
-     * <p/>
-     * <p/> variable declared in this can be referred to in parsable files.
-     *
-     * @param data The XML data.
-     *
-     * @throws CompilerException Description of the Exception
-     */
+	/**
+	 * Variable declaration is a fragment of the XML file. For example:
+	 * 
+	 * <pre>
+	 * &lt;variables&gt;
+	 *     &lt;variable name="nom" value="value"/&gt;
+	 *     &lt;variable name="foo" value="pippo"/&gt;
+	 * &lt;/variables&gt;
+	 * </pre>
+	 * 
+	 * Variable declared in this can be referred to in parsable files.
+	 * 
+	 * @param data The XML data.
+	 * @throws CompilerException Description of the Exception
+	 */
     protected void addVariables(IXMLElement data) throws CompilerException {
         notifyCompilerListener("addVariables", CompilerListener.BEGIN, data);
         // We get the varible list

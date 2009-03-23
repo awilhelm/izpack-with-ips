@@ -10,19 +10,20 @@ import java.util.regex.Pattern;
  * @author Alexis Wilhelm
  * @since February 2009
  */
-public class Wildcard {
-
+public class Wildcard
+{
 	/**
 	 * The characters describing this wildcarded sequence.
 	 */
-	private char[] value;
+	private final char[] value;
 
 	/**
 	 * Initialize this wildcard.
 	 * 
 	 * @param value The string describing this wildcarded sequence.
 	 */
-	public Wildcard (String value) {
+	public Wildcard (String value)
+	{
 		this.value = value.toCharArray();
 	}
 
@@ -34,11 +35,14 @@ public class Wildcard {
 	 * 
 	 * @return A {@link Pattern} one can use with the java.util.regex API.
 	 */
-	public Pattern toPattern () {
+	public Pattern toPattern ()
+	{
 		StringBuffer s = new StringBuffer();
 		s.append("^");
-		for (char c: value) {
-			switch (c) {
+		for (char c: value)
+		{
+			switch (c)
+			{
 				case '*':
 					s.append(".*");
 					continue;

@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import com.izforge.izpack.LocaleDatabase;
 import com.izforge.izpack.gui.IzPanelLayout;
 import com.izforge.izpack.installer.InstallData;
 import com.izforge.izpack.installer.InstallerFrame;
@@ -32,14 +33,14 @@ import com.sun.pkg.client.Image.FmriState;
  * @see IPSPacksPanel
  * @see IPSInstallPanel
  */
-public class IPSUpdatePanel extends IzPanel {
-
+public class IPSUpdatePanel extends IzPanel
+{
 	/**
 	 * A table model useful for displaying the state of installed packages in an
 	 * IPS image.
 	 */
-	private static class FmriStateTableModel extends AbstractTableModel {
-
+	private static class FmriStateTableModel extends AbstractTableModel
+	{
 		/**
 		 * This allows this table to get serialized.
 		 */
@@ -48,21 +49,25 @@ public class IPSUpdatePanel extends IzPanel {
 		/**
 		 * The names for the columns of this table's.
 		 */
-		private static final String[] columnNames = { "Name", "Installed",
-				"Upgradable" };
+		private final String[] columnNames;
 
 		/**
 		 * A list of the packages to be displayed in this table.
 		 */
-		private List<FmriState> pkgs;
+		private final List<FmriState> pkgs;
 
 		/**
+		 * @param lang The localized strings.
 		 * @param pkgs A list of the packages to be displayed and their current
 		 *        state.
 		 * @see Image#getInventory(String[], boolean)
 		 */
-		public FmriStateTableModel (List<FmriState> pkgs) {
+		public FmriStateTableModel (LocaleDatabase lang, List<FmriState> pkgs)
+		{
 			this.pkgs = pkgs;
+			columnNames = new String[] { lang.getString(this, "name"),
+					lang.getString(this, "installed"),
+					lang.getString(this, "upgradable") };
 		}
 
 		/**
@@ -74,14 +79,16 @@ public class IPSUpdatePanel extends IzPanel {
 		 * @see AbstractTableModel#getColumnClass(int)
 		 */
 		@Override
-		public Class<?> getColumnClass (int col) {
+		public Class<?> getColumnClass (int col)
+		{
 			return getValueAt(0, col).getClass();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		public int getColumnCount () {
+		public int getColumnCount ()
+		{
 			return columnNames.length;
 		}
 
@@ -89,25 +96,29 @@ public class IPSUpdatePanel extends IzPanel {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public String getColumnName (int col) {
+		public String getColumnName (int col)
+		{
 			return columnNames[col];
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		public int getRowCount () {
+		public int getRowCount ()
+		{
 			return pkgs.size();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
-		public Object getValueAt (int row, int col) {
-			switch (col) {
+		public Object getValueAt (int row, int col)
+		{
+			switch (col)
+			{
 				case 0:
 					Fmri pkg = pkgs.get(row).fmri;
-					return String.format("%s (%s, %s)", pkg.getName(), pkg.getVersion().getRelease(),
+					return String.format("%s (%s)", pkg.getName(),
 							pkg.getAuthority());
 				case 1:
 					return pkgs.get(row).installed;
@@ -129,7 +140,8 @@ public class IPSUpdatePanel extends IzPanel {
 		 * @see AbstractTableModel#isCellEditable(int, int)
 		 */
 		@Override
-		public boolean isCellEditable (int row, int col) {
+		public boolean isCellEditable (int row, int col)
+		{
 			return col > 0;
 		}
 
@@ -143,8 +155,10 @@ public class IPSUpdatePanel extends IzPanel {
 		 * @see AbstractTableModel#setValueAt(Object, int, int)
 		 */
 		@Override
-		public void setValueAt (Object value, int row, int col) {
-			switch (col) {
+		public void setValueAt (Object value, int row, int col)
+		{
+			switch (col)
+			{
 				case 1:
 					pkgs.get(row).installed = (Boolean) value;
 					break;
@@ -170,10 +184,10 @@ public class IPSUpdatePanel extends IzPanel {
 	 * @param data The all important object describing everything we need for
 	 *        the installation.
 	 */
-	public IPSUpdatePanel (InstallerFrame parent, InstallData data) {
+	public IPSUpdatePanel (InstallerFrame parent, InstallData data)
+	{
 		super(parent, data, new IzPanelLayout());
-
-		add(new JScrollPane(new JTable(new FmriStateTableModel(
+		add(new JScrollPane(new JTable(new FmriStateTableModel(idata.langpack,
 				idata.installedIPSPackages))));
 	}
 
@@ -184,9 +198,13 @@ public class IPSUpdatePanel extends IzPanel {
 	 * @see IzPanel#panelActivate()
 	 */
 	@Override
-	public void panelActivate () {
+	public void panelActivate ()
+	{
 		super.panelActivate();
-		if (idata.installedIPSPackages.isEmpty()) parent.skipPanel();
+		if (idata.installedIPSPackages.isEmpty())
+		{
+			parent.skipPanel();
+		}
 	}
 
 	/**
@@ -196,11 +214,20 @@ public class IPSUpdatePanel extends IzPanel {
 	 * @see IzPanel#panelDeactivate()
 	 */
 	@Override
-	public void panelDeactivate () {
+	public void panelDeactivate ()
+	{
 		idata.selectedIPSPackages.clear();
 		idata.unwantedIPSPackages.clear();
 		for (FmriState pkg: idata.installedIPSPackages)
-			if (!pkg.installed) idata.unwantedIPSPackages.add(pkg.fmri);
-			else if (pkg.upgradable) idata.selectedIPSPackages.add(pkg.fmri);
+		{
+			if (!pkg.installed)
+			{
+				idata.unwantedIPSPackages.add(pkg.fmri);
+			}
+			else if (pkg.upgradable)
+			{
+				idata.selectedIPSPackages.add(pkg.fmri);
+			}
+		}
 	}
 }

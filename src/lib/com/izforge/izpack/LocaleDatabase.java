@@ -252,4 +252,45 @@ public class LocaleDatabase extends TreeMap
         return message.replace(TEMP_QUOTING_CHARACTER, '\'');
     }
 
+	/**
+	 * Another method for retrieving an element. For those who don't want to
+	 * define an array.
+	 * 
+	 * @param object The object asking for the string.
+	 * @param key The string it's asking.
+	 * @param variables The optional variables to be incorporated in the string.
+	 * @return The requested string, after the variables are inserted.
+	 * @see #getString(String, String[])
+	 * @author Alexis Wilhelm
+	 * @since March 2009
+	 */
+	public String getString (Object object, String key, Object... variables)
+	{
+		key = object.getClass().getSimpleName() + "." + key;
+		String msg = getString(key);
+		if (msg == key) return key;
+		for (Object var: variables)
+		{
+			if (var == null)
+			{
+				var = "N/A";
+			}
+			else if (var instanceof String)
+			{
+				String str = (String) var;
+				if (str.startsWith("$"))
+				{
+					str = str.substring(1);
+					if (str.startsWith("{") && str.endsWith("}"))
+					{
+						str.substring(1, str.length() - 1);
+					}
+					var = getString(str);
+				}
+			}
+		}
+		msg = msg.replace('\'', TEMP_QUOTING_CHARACTER);
+		msg = MessageFormat.format(msg, variables);
+		return msg.replace(TEMP_QUOTING_CHARACTER, '\'');
+	}
 }

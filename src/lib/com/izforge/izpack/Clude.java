@@ -17,8 +17,8 @@ import com.izforge.izpack.util.Wildcard;
  * @author Alexis Wilhelm
  * @since January 2009
  */
-public class Clude implements Serializable {
-
+public class Clude implements Serializable
+{
 	/**
 	 * Allow this clude to get serialized.
 	 */
@@ -27,14 +27,14 @@ public class Clude implements Serializable {
 	/**
 	 * The pattern the target must match.
 	 */
-	private Pattern pattern;
+	private final Pattern pattern;
 
 	/**
 	 * Whether we want it or not. True would correspond to an &lt;include&gt;
 	 * rule in the XML descriptor, and false would come along with an
 	 * &lt;exclude&gt; rule.
 	 */
-	private Boolean included;
+	private final Boolean included;
 
 	/**
 	 * Tell whether this clude is describes an inclusion or an exclusion.
@@ -42,7 +42,8 @@ public class Clude implements Serializable {
 	 * @return True when this clude describes an inclusion, false when it
 	 *         describes an exclusion.
 	 */
-	public Boolean isIncluded () {
+	public Boolean isIncluded ()
+	{
 		return included;
 	}
 
@@ -53,7 +54,8 @@ public class Clude implements Serializable {
 	 * @param included True when this clude describes an inclusion, false when
 	 *        it describes an exclusion.
 	 */
-	public Clude (String pattern, Boolean included) {
+	public Clude (String pattern, Boolean included)
+	{
 		this.pattern = new Wildcard(pattern).toPattern();
 		this.included = included;
 	}
@@ -67,22 +69,36 @@ public class Clude implements Serializable {
 	 * @param candidates All of the available files or packages.
 	 * @return A set of files or packages matching the pattern.
 	 */
-	public Collection<String> filter (Collection<String> pkgset, Iterable<String> candidates) {
-		if (included) {
+	public Collection<String> filter (Collection<String> pkgset,
+			Iterable<String> candidates)
+	{
+		if (included)
+		{
 			/*
 			 * Search the repository for every packages matching the pattern,
 			 * and include them in the set.
 			 */
 			for (String in: candidates)
-				if (pattern.matcher(in).matches()) pkgset.add(in);
+			{
+				if (pattern.matcher(in).matches())
+				{
+					pkgset.add(in);
+				}
+			}
 		}
-		else {
+		else
+		{
 			/*
 			 * Search the set for every excludable packages.
 			 */
 			Iterable<String> nominees = new HashSet<String>(pkgset);
 			for (String ex: nominees)
-				if (pattern.matcher(ex).matches()) pkgset.remove(ex);
+			{
+				if (pattern.matcher(ex).matches())
+				{
+					pkgset.remove(ex);
+				}
+			}
 		}
 		return pkgset;
 	}

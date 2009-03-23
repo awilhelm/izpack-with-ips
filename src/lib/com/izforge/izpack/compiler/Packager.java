@@ -22,7 +22,6 @@ package com.izforge.izpack.compiler;
 
 import com.izforge.izpack.Pack;
 import com.izforge.izpack.PackFile;
-import com.izforge.izpack.IPSPack;
 import com.izforge.izpack.adaptator.IXMLElement;
 import com.izforge.izpack.adaptator.IXMLWriter;
 import com.izforge.izpack.adaptator.impl.XMLElementImpl;
@@ -421,8 +420,6 @@ public class Packager extends PackagerBase
             primaryJarStream.closeEntry();
         }
     }
-
-
 
     private Pack200.Packer createAgressivePack200Packer()
     {
