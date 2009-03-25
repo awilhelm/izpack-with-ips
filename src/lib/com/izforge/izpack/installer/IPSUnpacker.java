@@ -30,7 +30,7 @@ import com.sun.pkg.client.Image.ImagePlan;
 public class IPSUnpacker extends UnpackerBase
 {
 	/**
-	 * Some callbacks useful for tracking the progress of the actions performed
+	 * Some callbacks useful for trackje faactions performed
 	 * by {@link ImagePlan#execute(ImagePlanProgressTracker)}.
 	 */
 	private static class ImagePlanProgressTrackerForIzPack extends
@@ -305,6 +305,8 @@ public class IPSUnpacker extends UnpackerBase
 		}
 		String configFile = idata.getInstallPath()
 				+ "/pkg/lib/bootstrap.properties";
+		File dir = new File(idata.getInstallPath() + "/pkg/lib");
+		dir.mkdirs();
 		p.store(
 				new PrintWriter(new BufferedWriter(new FileWriter(configFile))),
 				"Parameters for the UC Bootstrap");
@@ -318,15 +320,14 @@ public class IPSUnpacker extends UnpackerBase
 		 * Launch the bootstrap. The path "/pkg/lib" is there to allow
 		 * `pkg-bootstrap.jar` to find `pkg-client.jar`, which is required.
 		 */
-		Process bootstrap = Runtime.getRuntime().exec(args, null,
-				new File(idata.getInstallPath(), "/pkg/lib"));
+		Process bootstrap = Runtime.getRuntime().exec(args, null, dir);
 		/*
 		 * If the command went fine, launch the Sun Update Center.
 		 */
 		if (bootstrap.waitFor() == 0)
 		{
-			Runtime.getRuntime().exec(
-					idata.getInstallPath() + "/updatetool/bin/updatetool");
+            // TODO: there is a problem when the install path contains a space
+			Runtime.getRuntime().exec(idata.getInstallPath().replaceAll(" ", "\\ ") + "/updatetool/bin/updatetool") ;
 		}
 		else
 		{

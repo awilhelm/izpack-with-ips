@@ -108,17 +108,19 @@
 	<str id="PacksPanel.notAscertainable" txt="not ascertainable"/>
 
 	<!-- IPSPacksPanel strings -->
-	<str id="IPSPacksPanel.headline" txt="Select the packs you want to install:"/>
+	<str id="IPSPacksPanel.headline" txt="IPS packs to be installed"/>
 	<str id="IPSPacksPanel.description" txt="Description" />
 	<str id="IPSPacksPanel.name" txt="Packs' names" />
 	<str id="IPSPacksPanel.version" txt="Version:" />
 
 	<!-- IPSUpdatePanel strings -->
-	<str id="IPSPacksPanel.name" txt="Package name"/>
-	<str id="IPSPacksPanel.installed" txt="Installed"/>
-	<str id="IPSPacksPanel.upgradable" txt="Upgradable"/>
+	<str id="IPSUpdatePanel.headline" txt="IPS packages to be updated"/>
+	<str id="IPSUpdatePanel.name" txt="Package name"/>
+	<str id="IPSUpdatePanel.installed" txt="Installed"/>
+	<str id="IPSUpdatePanel.upgradable" txt="Upgradable"/>
 
 	<!-- IPSPrefsPanel -->
+	<str id="IPSPrefsPanel.headline" txt="IPS preferences" />
 	<str id="IPSPrefsPanel.instructions" txt="Please check the ways you want the software to get upgraded." />
 	<str id="IPSPrefsPanel.keeptoupdate" txt="Yes, I wanna keep this installer so that I can manually upgrade my IPS packages." />
 	<str id="IPSPrefsPanel.installupdatecenter" txt="Yes, I wanna install the Sun Update Center and use it to automatically upgrade my IPS packages." />
@@ -137,6 +139,7 @@
 	<str id="ImagePlanProgressTrackerForIzPack.startUpdatePhase" txt="Updating {0} package{1}..."/>
 
 	<!-- ProxyPanel strings -->
+	<str id="ProxyPanel.headline" txt="Proxy"/>
 	<str id="ProxyPanel.instructions" txt="Put the infos of your proxy's in there (let this blank if you ain't none):" />
 	<str id="ProxyPanel.hostname" txt="Host name:" />
 	<str id="ProxyPanel.portnumber" txt="Port number:" />

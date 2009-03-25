@@ -108,17 +108,19 @@
 	<str id="PacksPanel.notAscertainable" txt="incertain"/>
 
 	<!-- IPSPacksPanel strings -->
-	<str id="IPSPacksPanel.headline" txt="Choisissez ici les paquetages IPS à installer :"/>
+	<str id="IPSPacksPanel.headline" txt="Packs IPS à installer"/>
 	<str id="IPSPacksPanel.description" txt="Description"/>
 	<str id="IPSPacksPanel.name" txt="Nom des packs"/>
 	<str id="IPSPacksPanel.version" txt="Version :"/>
 
 	<!-- IPSUpdatePanel strings -->
-	<str id="IPSPacksPanel.name" txt="Nom du paquetage"/>
-	<str id="IPSPacksPanel.installed" txt="Installé"/>
-	<str id="IPSPacksPanel.upgradable" txt="Mise à jour disponible"/>
+	<str id="IPSUpdatePanel.headline" txt="Paquetages IPS à mettre à jour"/>
+	<str id="IPSUpdatePanel.name" txt="Nom du paquetage"/>
+	<str id="IPSUpdatePanel.installed" txt="Installé"/>
+	<str id="IPSUpdatePanel.upgradable" txt="Mise à jour disponible"/>
 
 	<!-- IPSPrefsPanel -->
+	<str id="IPSPrefsPanel.headline" txt="Préférences pour IPS" />
 	<str id="IPSPrefsPanel.instructions" txt="Merci d'indiquer de quelle manière vous souhaitez pouvoir mettre à jour votre installation." />
 	<str id="IPSPrefsPanel.keeptoupdate" txt="Oui, je veux garder cet installateur et pouvoir l'utiliser pour mettre à jour mes paquets IPS." />
 	<str id="IPSPrefsPanel.installupdatecenter" txt="Oui, je veux installer le Sun Update Center et l'utiliser pour mettre à jour mes paquets IPS automatiquement." />

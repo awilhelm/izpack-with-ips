@@ -65,7 +65,8 @@ public class IPSInstallPanel extends InstallPanel
 		}
 		else
 		{
-			SwingUtilities.invokeLater(new IPSUnpacker(idata, this, parent));
+			//SwingUtilities.invokeLater(new IPSUnpacker(idata, this, parent));
+            new Thread(new IPSUnpacker(idata, this, parent)).start();
 		}
 	}
 }

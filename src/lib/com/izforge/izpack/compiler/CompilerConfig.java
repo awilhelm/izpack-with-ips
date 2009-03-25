@@ -1195,7 +1195,7 @@ public class CompilerConfig extends Thread {
 						IPSUnpacker.TEMPLATE,
 						new File(compiler.getVariables().getProperty(
 								"ips-empty-image",
-								Compiler.IZPACK_HOME + "emptyimage.zip")).toURI().toURL());
+								Compiler.IZPACK_HOME + "/emptyimage.zip")).toURI().toURL());
 			}
 			catch (MalformedURLException e)
 			{
